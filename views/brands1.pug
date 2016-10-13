@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  .page-header
+    h3 All Brands
+    li(class=(title == 'Login') ? 'active' : undefined)
+            a(href='/auth/googleanalytics') Tether GA account
+table
+  thead
+    tr
+      th Account Name
+      th Account ID
+  tbody
+    each brand in brands
+      tr
+        td= brand.AccountName
+        td= brand.AccountID

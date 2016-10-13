@@ -117,6 +117,8 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 * Custom app routes.
 */
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
+app.get('/brands/:brandId', passportConfig.isAuthenticated,brandController.getBrandByBrandId);
+app.post('/brands/:brandId/profile', passportConfig.isAuthenticated, brandController.postUpdateBrand);
 
 
 /**
@@ -189,6 +191,10 @@ app.get('/auth/github/callback', passport.authenticate('github', { failureRedire
   res.redirect(req.session.returnTo || '/');
 });
 app.get('/auth/google', passport.authenticate('google', { scope: 'profile email' }));
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  res.redirect(req.session.returnTo || '/');
+});
+app.get('/auth/googleanalytics', passport.authenticate('google', { scope: 'profile email https://www.googleapis.com/auth/analytics.readonly' }));
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });

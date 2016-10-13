@@ -1,0 +1,43 @@
+extends layout
+
+
+block content
+  .page-header
+    h3 #{brand.AccountName}
+
+  form.form-horizontal(action='/brands/' + brand.AccountID + '/profile', method='POST')
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group
+      label.col-sm-3.control-label(for='name') Account ID:
+      .col-sm-7
+        label.col-sm-3.control-label(for='name') #{brand.AccountID}
+    .form-group
+      label.col-sm-3.control-label(for='website') Account Name:
+      .col-sm-7
+        input.form-control(type='text', name='accountname', id='accountname', value=brand.AccountName)
+    .form-group
+      label.col-sm-3.control-label(for='name') View ID:
+      .col-sm-7
+        label.col-sm-3.control-label(for='name') #{brand.ViewID}
+    .form-group
+      label.col-sm-3.control-label(for='name') View Name:
+      .col-sm-7
+        label.col-sm-3.control-label(for='name') #{brand.ViewName}
+    .form-group
+      label.col-sm-3.control-label(for='name') oAuthToken:
+      .col-sm-7
+        label.col-sm-3.control-label(for='name') #{brand.oAuthToken}
+    .form-group
+      label.col-sm-3.control-label(for='name') User Email:
+      .col-sm-7
+        input.form-control(type='text', name='useremail', id='useremail', value=brand.oAuthUserEmail)
+    .form-group
+      label.col-sm-3.control-label(for='name') Brand Tags:
+      .col-sm-7
+        input.form-control(type='textarea', name='tags', id='tags', value=brand.tags.toString())
+
+    .form-group
+      .col-sm-offset-3.col-sm-4
+        button.btn.btn.btn-primary(type='submit')
+          i.fa.fa-pencil
+          | Update Brand
