@@ -1,0 +1,38 @@
+const mongoose = require('mongoose');
+var mongoosastic=require("mongoosastic");
+
+const brandSchema = new mongoose.Schema({
+  _id: String,
+  AccountID: String,
+  AccountName: String,
+  ViewName: String,
+  ViewID: String,
+  oAuthToken: String,
+  oAuthUserEmail: String,
+  tags: String
+});
+
+brandSchema.plugin(mongoosastic,{hydrate:false, hydrateOptions: {lean: false},  
+  host:"127.0.0.1",
+  port: 9200}
+ // protocol: "https",
+ // auth: "username:password"
+//  ,curlDebug: true
+);
+
+const Brand = mongoose.model('Brand', brandSchema);
+
+
+Brand.createMapping(function(err, mapping){  
+  if(err){
+    console.log('error creating mapping (you can safely ignore this)');
+    console.log(err);
+  }else{
+    console.log('mapping created!');
+    console.log(mapping);
+  }
+});
+
+
+module.exports = Brand;
+
