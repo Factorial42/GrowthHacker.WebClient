@@ -17,8 +17,9 @@ block content
 			th Tethered By  
 			th GA Profile   
 			th Tags  
-			th Total Records
-			th Last Ingest  			
+			th Records
+			th Refresh
+			th Dashboard  			
 		tr
 		tbody
 			for brand in brands
@@ -32,6 +33,9 @@ block content
 					td= brand.account_tags
 					td= brand.account_record_total
 					td= brand.account_record_lastrefresh
+					td
+						a(href='http://52.37.72.190:5601/app/kibana#/dashboard/Sweat-Tailor-Ecommerce-Dashboard') View
+
 				tr
 			else
 				tr

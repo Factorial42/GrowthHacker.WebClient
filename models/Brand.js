@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const brandSchema = new mongoose.Schema({
+	'@timestamp': { type: Date, default: Date.now },
 	account_name: String,
 	account_id: { type: String, unique: true },
 	account_source: String,

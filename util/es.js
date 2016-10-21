@@ -19,13 +19,13 @@ function ping() {
 }
 
 function index(indexName, indexType, object) {
+    console.log(JSON.stringify(object));
     client.index({
         index: indexName,
         id: Object.account_native_id,
         type: indexType,
-        body: {
+        body:
             object
-        }
     }, function(err, resp, status) {
         console.log(resp);
         console.log(status);
