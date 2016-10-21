@@ -1,6 +1,7 @@
 /**
  * Module dependencies.
  */
+const ES = require('./util/es.js');
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
@@ -62,9 +63,10 @@ mongoose.connection.on('error', () => {
 /**
 * Connect to Elastic
 */
-
-//var esClient = new elasticsearch.Client({host: 'http://localhost:9200'});
-
+if (ES.ping())
+  console.log('%s ElasticSearch error. Please make sure ' + process.env.ELASTICHOSTANDPORT + ' is running.', chalk.red('✗'));
+else
+  console.log('%s ElasticSearch connection established to ==> ' + process.env.ELASTICHOSTANDPORT + '!', chalk.green('✓'));
 
 /**
  * Express configuration.
@@ -124,7 +126,6 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 * Custom app routes.
 */
 //app.get('/hello', function(req, res){res.sendfile('views/hello.html');});
-app.get('/analytics', passportConfig.isAuthenticated,brandController.getGA);
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
 app.get('/brands/:brandId', passportConfig.isAuthenticated,brandController.getBrandByBrandId);
 app.post('/brands/:brandId/profile', passportConfig.isAuthenticated, brandController.postUpdateBrand);

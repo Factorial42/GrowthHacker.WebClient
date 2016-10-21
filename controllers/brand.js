@@ -2,6 +2,15 @@ var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
 
 const Brand = require('../models/Brand.js');
+const OAuth2 = googleapis.auth.OAuth2;
+
+//Setup oAuth for testing
+const oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost:3000/auth/google/callback');
+
+//GA Tokens
+var gaToken;
+var gaRefreshToken;
+
 
 exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
@@ -34,42 +43,7 @@ exports.getBrands = (req, res) => {
  * GET /brands
  * List all Views/Accounts etc.
  */
-exports.getGA = (req, res) => {
-    if (req.user) {
-        const OAuth2 = googleapis.auth.OAuth2;
 
-        var oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost:3000/auth/google/callback');
-
-        //set/read token from DB
-        oauth2Client.credentials = {
-            //access_token: 'ya29.Ci9_Aws_eMxjJ_xM5zkrNlxnkPfNjr8QxKcY8diziZNRTEi5mj2JXh0gXthhhmRNHg',
-            access_token: 'ya29.CjCAA8JfhIEYybDEpWq75ewafvVN_9M4ZrmyTl8mI0ywy7cGHVW6ZQ2NboLcOrczgew',
-        };
-        console.log(oauth2Client);
-        analytics.management.accounts.list({
-            'auth': oauth2Client
-        }, function(error, response) {
-            if (error) {
-                console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
-                console.log(error);
-            } else
-                console.log(response);
-            if (response.items && response.items.length) {
-                // Get the first Google Analytics account.
-                var firstAccountId = response.items[0].id;
-                console.log("Account id fetch is:" + firstAccountId);
-                analytics.management.webproperties.list({
-                    'auth': oauth2Client,
-                    'accountId': firstAccountId
-                });
-            } else {
-                console.log('No accounts found for this user.');
-            }
-
-        });
-        res.render('helloanal');
-    }
-};
 
 
 /**
@@ -105,74 +79,3 @@ exports.postUpdateBrand = (req, res, next) => {
         });
     });
 };
-
-
-
-//GA Crap
-
-function handleProperties(response) {
-    // Handles the response from the webproperties list method.
-    if (response.items && response.items.length) {
-
-        // Get the first Google Analytics account
-        var firstAccountId = response.items[0].accountId;
-
-        // Get the first property ID
-        var firstPropertyId = response.items[0].id;
-
-        // Query for Views (Profiles).
-        queryProfiles(firstAccountId, firstPropertyId);
-    } else {
-        console.log('No properties found for this user.');
-    }
-}
-
-
-function queryProfiles(accountId, propertyId) {
-    // Get a list of all Views (Profiles) for the first property
-    // of the first Account.
-    analytics.management.profiles.list({
-            'accountId': accountId,
-            'webPropertyId': propertyId
-        })
-        .then(handleProfiles)
-        .then(null, function(err) {
-            // Log any errors.
-            console.log("Error querying profiles");
-            console.log(err);
-        });
-}
-
-
-function handleProfiles(response) {
-    // Handles the response from the profiles list method.
-    if (response.items && response.items.length) {
-        // Get the first View (Profile) ID.
-        var firstProfileId = response.items[0].id;
-
-        // Query the Core Reporting API.
-        queryCoreReportingApi(firstProfileId);
-    } else {
-        console.log('No views (profiles) found for this user.');
-    }
-}
-
-
-function queryCoreReportingApi(profileId) {
-    // Query the Core Reporting API for the number sessions for
-    // the past seven days.
-    analytics.data.ga.get({
-            'ids': 'ga:' + profileId,
-            'start-date': '7daysAgo',
-            'end-date': 'today',
-            'metrics': 'ga:sessions'
-        })
-        .then(function(response) {
-            var formattedJson = JSON.stringify(response.result, null, 2);
-            document.getElementById('query-output').value = formattedJson;
-        })
-        .then(null, function(err) {
-            // Log any errors.
-            console.log(err);
-        });
-}

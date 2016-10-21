@@ -1,3 +1,4 @@
+const GA = require('../util/getGA.js'); //Hack for now
 const _ = require('lodash');
 const passport = require('passport');
 const request = require('request');
@@ -239,7 +240,8 @@ passport.use(new GoogleStrategy({
   callbackURL: '/auth/google/callback',
   passReqToCallback: true
 }, (req, accessToken, refreshToken, profile, done) => {
-  console.log(" accessToken:" + accessToken + " refreshToken: " + refreshToken);
+  //console.log(" accessToken:" + accessToken + " refreshToken: " + refreshToken);
+
   if (req.user) {
     User.findOne({ google: profile.id }, (err, existingUser) => {
       if (err) { return done(err); }
@@ -250,13 +252,15 @@ passport.use(new GoogleStrategy({
         User.findById(req.user.id, (err, user) => {
           if (err) { return done(err); }
           user.google = profile.id;
-          user.tokens.push({ kind: 'google', accessToken });
+          user.tokens.push({ kind: 'google#analytics#access_token', accessToken });
+          user.tokens.push({ kind: 'google#analytics#refresh_token', refreshToken });
           user.profile.name = user.profile.name || profile.displayName;
           user.profile.gender = user.profile.gender || profile._json.gender;
           user.profile.picture = user.profile.picture || profile._json.image.url;
           user.save((err) => {
-            req.flash('info', { msg: 'Google account has been linked.' });
+            req.flash('info', { msg: 'Google Analytics Account has been linked to your login_id.' });
             done(err, user);
+            GA.getGA(accessToken,refreshToken,req.user.email); //trigger case
           });
         });
       }
