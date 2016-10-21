@@ -2,27 +2,36 @@ extends layout
 
 block content
 	.page-header
-		h3 All Brands
-		li(class=(title == 'Login') ? 'active' : undefined)
-						a(href='/auth/googleanalytics') Tether GA account
+		h3 All Brands 		
+		td
+		a(href='/auth/googleanalytics')
+			button(type="button") Tether Google Analytics Account
+
+
 	div
 	table
 		thead
-			th Account Name
-			th View Name
-			th View ID
-			th oAuth Token
-			th oAuth User Email
+			th Name    
+			th Website     
+			th Industry Vertical    
+			th Tethered By  
+			th GA Profile   
+			th Tags  
+			th Total Records
+			th Last Ingest  			
 		tr
 		tbody
 			for brand in brands
 				tr
 					td
-						a(href='/brands/' + brand.AccountID) #{brand.AccountName} 
-					td= brand.ViewName		
-					td= brand.ViewID		
-					td= brand.oAuthToken		
-					td= brand.oAuthUserEmail		
+						a(href='/brands/' + brand.account_id) #{brand.account_name} 
+					td= brand.account_website_url				
+					td= brand.account_industry_vertical			
+					td= brand.account_tetherer_email
+					td= brand.account_default_profile_id
+					td= brand.account_tags
+					td= brand.account_record_total
+					td= brand.account_record_lastrefresh
 				tr
 			else
 				tr

@@ -103,6 +103,7 @@ function handleProperties(response, brand) {
 
                 //set Brand relevant attribs
                 brand.account_industry_vertical = response.items[p].industryVertical;
+                brand.account_tags.push(response.items[p].industryVertical);
                 brand.account_website_url = response.items[p].websiteUrl;
                 brand.account_default_profile_id = response.items[p].defaultProfileId;
                 brand.account_native_id = response.items[p].id;

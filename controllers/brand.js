@@ -16,7 +16,7 @@ exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
     console.log("Brand being edited with " + brandId);
     Brand.findOne({
-        AccountID: brandId
+        account_id: brandId
     }, function(err, docs) {
         //console.log(docs);
         //convert array to string
@@ -60,13 +60,14 @@ exports.postUpdateBrand = (req, res, next) => {
     }
 
     Brand.findOne({
-        AccountID: brandId
+        account_id: brandId
     }, function(err, brand) {
         if (err) {
             return next(err);
         }
-        brand.oAuthUserEmail = req.body.useremail || '';
-        brand.tags = req.body.tags;
+        brand.account_record_lastrefresh = req.body.account_record_lastrefresh.valueOf();
+        brand.account_record_total = req.body.account_record_total.valueOf();
+        brand.account_tags = req.body.account_tags;
         brand.save((err) => {
             if (err) {
                 console.log(err);

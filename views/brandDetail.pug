@@ -3,38 +3,42 @@ extends layout
 
 block content
   .page-header
-    h3 #{brand.AccountName}
+    h3 #{brand.account_name}
 
-  form.form-horizontal(action='/brands/' + brand.AccountID + '/profile', method='POST')
+  form.form-horizontal(action='/brands/' + brand.account_id + '/profile', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group
-      label.col-sm-3.control-label(for='name') Account ID:
+      label.col-sm-3.control-label(for='name') Brand Account ID:
       .col-sm-7
-        label.col-sm-3.control-label(for='name') #{brand.AccountID}
+        label.col-sm-3.control-label(for='name') #{brand.account_id}
     .form-group
-      label.col-sm-3.control-label(for='website') Account Name:
+      label.col-sm-3.control-label(for='website') Brand Name:
       .col-sm-7
-        input.form-control(type='text', name='accountname', id='accountname', value=brand.AccountName)
+        input.form-control(type='text', name='account_name', id='account_name', value=brand.account_name)
     .form-group
-      label.col-sm-3.control-label(for='name') View ID:
+      label.col-sm-3.control-label(for='name') Website URL:
       .col-sm-7
-        label.col-sm-3.control-label(for='name') #{brand.ViewID}
+        label.col-sm-3.control-label(for='name') #{brand.account_website_url}
     .form-group
-      label.col-sm-3.control-label(for='name') View Name:
+      label.col-sm-3.control-label(for='name') Industry Vertical:
       .col-sm-7
-        label.col-sm-3.control-label(for='name') #{brand.ViewName}
+        label.col-sm-3.control-label(for='name') #{brand.account_industry_vertical}
     .form-group
-      label.col-sm-3.control-label(for='name') oAuthToken:
+      label.col-sm-3.control-label(for='name') Last Run Ingested Records:
       .col-sm-7
-        label.col-sm-3.control-label(for='name') #{brand.oAuthToken}
+        input.form-control(type='text', name='account_record_lastrefresh', id='account_record_lastrefresh', value=brand.account_record_lastrefresh)
     .form-group
-      label.col-sm-3.control-label(for='name') User Email:
+      label.col-sm-3.control-label(for='name') Total Ingested Records:
       .col-sm-7
-        input.form-control(type='text', name='useremail', id='useremail', value=brand.oAuthUserEmail)
+        input.form-control(type='text', name='account_record_total', id='account_record_total', value=brand.account_record_total)        
+    .form-group
+      label.col-sm-3.control-label(for='name') Tethered User Email:
+      .col-sm-7
+        input.form-control(type='text', name='account_tetherer_email', id='account_tetherer_email', value=brand.account_tetherer_email)
     .form-group
       label.col-sm-3.control-label(for='name') Brand Tags:
       .col-sm-7
-        input.form-control(type='textarea', name='tags', id='tags', value=brand.tags.toString())
+        input.form-control(type='textarea', name='account_tags', id='account_tags', value=brand.account_tags.toString())
 
     .form-group
       .col-sm-offset-3.col-sm-4
