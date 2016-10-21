@@ -169,12 +169,15 @@ function handleProfiles(response, brand,propertyId) {
                 //finally save the brand
                 if ( brand.account_native_id.valueOf() != prevAccount ){
                     prevAccount = brand.account_native_id;
-                    esBrand = brand.toObject();
-                    delete esBrand["_id"];
                     brand.save(function(err) {
                     if (err) console.log('Error saving brand' + err);
-                    else
+                    else{
+                        //console.log ("Brand before:" + JSON.stringify(brand));
+                        var esBrand = brand.toObject();
+                        delete esBrand["_id"]; 
+                        //console.log ("Brand after:" + JSON.stringify(esBrand));                         
                         ES.index('brands','brand',esBrand);
+                    }
                 });
             }
         }
