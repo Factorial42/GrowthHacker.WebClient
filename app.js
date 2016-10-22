@@ -127,6 +127,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 */
 //app.get('/hello', function(req, res){res.sendfile('views/hello.html');});
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
+app.get('/analytics', passportConfig.isAuthenticated,brandController.getAnalytics);
 app.get('/brands/:brandId', passportConfig.isAuthenticated,brandController.getBrandByBrandId);
 app.post('/brands/:brandId/profile', passportConfig.isAuthenticated, brandController.postUpdateBrand);
 
@@ -205,7 +206,7 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
   res.redirect(req.session.returnTo || '/');
 });
 app.get('/auth/googleanalytics', passport.authenticate('google', {accessType: 'offline', scope: 'https://www.googleapis.com/auth/analytics.readonly profile email' }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+app.get('/auth/google/callback', passport.authenticate('google', { successRedirect: '/brands',failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });
 app.get('/auth/twitter', passport.authenticate('twitter'));

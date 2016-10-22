@@ -38,6 +38,9 @@ exports.getBrands = (req, res) => {
     });
 };
 
+exports.getAnalytics = (req, res) => {
+        res.render('analytics', {});
+};
 
 /**
  * GET /brands

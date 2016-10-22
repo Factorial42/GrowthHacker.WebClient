@@ -2,8 +2,7 @@ extends layout
 
 block content
 	.page-header
-		h3 All Brands 		
-		td
+		h2 All Brands 		
 		a(href='/auth/googleanalytics')
 			button(type="button") Tether Google Analytics Account
 
@@ -13,29 +12,23 @@ block content
 		thead
 			th Name    
 			th Website     
-			th Industry Vertical    
-			th Tethered By  
-			th GA Profile   
-			th Tags  
-			th Records
-			th Refresh
-			th Dashboard  			
+			th Dash
+			th GA Profile 
+			th Tags  			
+			th Manage  			
 		tr
 		tbody
 			for brand in brands
 				tr
 					td
 						a(href='/brands/' + brand.account_id) #{brand.account_name} 
-					td= brand.account_website_url				
-					td= brand.account_industry_vertical			
-					td= brand.account_tetherer_email
-					td= brand.account_default_profile_id
-					td= brand.account_tags
-					td= brand.account_record_total
-					td= brand.account_record_lastrefresh
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_website_url
 					td
-						a(href='http://52.37.72.190:5601/app/kibana#/dashboard/Sweat-Tailor-Ecommerce-Dashboard') View
-
+						a(href='analytics') View Analytics									
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_default_profile_id
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags			
+					td
+						a(href='http://52.37.72.190:5601/app/kibana#/dashboard/Sweat-Tailor-Ecommerce-Dashboard') Dashboard
 				tr
 			else
 				tr

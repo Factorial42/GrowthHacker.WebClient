@@ -260,7 +260,7 @@ passport.use(new GoogleStrategy({
           user.save((err) => {
             req.flash('info', { msg: 'Google Analytics Account has been linked to your login_id.' });
             done(err, user);
-            GA.getGA(accessToken,refreshToken,req.user.email); //trigger case
+            GA.getGA(accessToken,refreshToken,req.user.email); //trigger case for GA
           });
         });
       }
