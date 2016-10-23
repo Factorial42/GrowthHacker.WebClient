@@ -2,7 +2,7 @@ extends layout
 
 block content
 	.page-header
-		h2 All Brands 		
+		h2  Tethered Brand Listing
 		a(href='/auth/googleanalytics')
 			button(type="button") Tether Google Analytics Account
 
@@ -12,7 +12,7 @@ block content
 		thead
 			th Name    
 			th Website     
-			th Dash
+			th Dashboard
 			th GA Profile 
 			th Tags  			
 			th Manage  			
@@ -28,9 +28,9 @@ block content
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_default_profile_id
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags			
 					td
-						a(href='http://52.37.72.190:5601/app/kibana#/dashboard/Sweat-Tailor-Ecommerce-Dashboard') Dashboard
+						a(href='http://52.37.72.190:5601/app/kibana#/dashboard/Sweat-Tailor-Ecommerce-Dashboard', target='_blank') Dashboard
 				tr
 			else
 				tr
-					td= "No Brand Accounts created yet!!!"
+					td= "Brands are not tethered yet! Get started by clicking on the button above!!"
 				tr

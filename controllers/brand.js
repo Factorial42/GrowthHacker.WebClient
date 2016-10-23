@@ -39,7 +39,13 @@ exports.getBrands = (req, res) => {
 };
 
 exports.getAnalytics = (req, res) => {
-        res.render('analytics', {});
+    //Ideally get all the dashboard types associated or applicable to this brand
+    //These types are set up in the edit/update brand
+
+    //For now hardcode the types available
+    var dashboardTypes = ["eCommerce", "Mobile Commerce", "Content Marketing", "Site Performance","Real-time Overview","S E O Overview"];
+
+        res.render('analytics', {dashboardTypes});
 };
 
 /**
