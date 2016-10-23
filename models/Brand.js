@@ -19,6 +19,7 @@ const brandSchema = new mongoose.Schema({
 	account_tetherer_email: String,
 	account_record_total: { type: Number, default: 0 },
 	account_record_lastrefresh: { type: Number, default: 0 },
+	account_dashboard_types: [],
   	views: [{
     view_id: String,
     view_name: String,

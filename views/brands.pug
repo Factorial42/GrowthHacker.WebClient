@@ -15,7 +15,7 @@ block content
 			th Dashboard
 			th GA Profile 
 			th Tags  			
-			th Manage  			
+			th Types  			
 		tr
 		tbody
 			for brand in brands
@@ -23,12 +23,16 @@ block content
 					td
 						a(href='/brands/' + brand.account_id) #{brand.account_name} 
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_website_url
-					td
-						a(href='analytics') View Analytics									
+					if (brand.account_dashboard_types.length > 0 )
+							td 
+								a(href='analytics/' + brand.account_id) View Analytics									
+					else
+							td 
+								a(href='/brands/' + brand.account_id) Not Set 
+					
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_default_profile_id
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags			
-					td
-						a(href='http://52.37.72.190:5601/app/kibana#/dashboard/Sweat-Tailor-Ecommerce-Dashboard', target='_blank') Dashboard
+					td= brand.account_dashboard_types
 				tr
 			else
 				tr

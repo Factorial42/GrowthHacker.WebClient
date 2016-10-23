@@ -38,20 +38,20 @@ exports.getBrands = (req, res) => {
     });
 };
 
-exports.getAnalytics = (req, res) => {
-    //Ideally get all the dashboard types associated or applicable to this brand
-    //These types are set up in the edit/update brand
-
-    //For now hardcode the types available
-    var dashboardTypes = ["eCommerce", "Mobile Commerce", "Content Marketing", "Site Performance","Real-time Overview","S E O Overview"];
-
-        res.render('analytics', {dashboardTypes});
-};
-
 /**
  * GET /brands
  * List all Views/Accounts etc.
  */
+exports.getAnalytics = (req, res) => {
+     var brandId = req.params.brandId;
+     Brand.findOne({
+        account_id: brandId
+    }, function(err, doc) {
+        res.render('analytics', {
+            brand: doc
+        });
+    });
+};
 
 
 
@@ -77,6 +77,7 @@ exports.postUpdateBrand = (req, res, next) => {
         brand.account_record_lastrefresh = req.body.account_record_lastrefresh.valueOf();
         brand.account_record_total = req.body.account_record_total.valueOf();
         brand.account_tags = req.body.account_tags;
+        brand.account_dashboard_types = req.body.account_dashboard_types;
         brand.save((err) => {
             if (err) {
                 console.log(err);
