@@ -14,7 +14,7 @@ var gaRefreshToken;
 
 exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
-    console.log("Brand being edited with " + brandId);
+    //console.log("Brand being edited with " + brandId);
     Brand.findOne({
         account_id: brandId
     }, function(err, docs) {

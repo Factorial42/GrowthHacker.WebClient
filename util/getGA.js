@@ -167,7 +167,7 @@ function handleProfiles(response, brand,propertyId) {
                 });
               }
                 //finally save the brand
-                if ( brand.account_native_id.valueOf() != prevAccount ){
+                if ( brand.account_native_id.valueOf() != prevAccount && !doesBrandAccountExist(brand.account_id)){
                     prevAccount = brand.account_native_id;
                     brand.save(function(err) {
                     if (err) console.log('Error saving brand' + err);
@@ -210,6 +210,21 @@ function queryCoreReportingApi(profileId) {
         var formattedJson = JSON.stringify(response.result, null, 2);
         console.log(formattedJson);
     });
+}
+
+function doesBrandAccountExist(brandId){
+    //console.log("doesBrandAccountExist in getGA.js:: " + brandId);
+    var status = false;
+    Brand.find((err, brands) => {
+        if (err) console.log(err);
+    for (var i = 0; i < brands.length; i++) {
+        if (brands[i].account_id == brandId) {
+            console.log("doesBrandAccountExist loop:: " + brands[i].account_id + " <=>" + brandId);        
+        status = true;
+        }
+    }       
+});
+     return status;
 }
 
 module.exports.getGA = getGA;
