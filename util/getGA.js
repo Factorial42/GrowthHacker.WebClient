@@ -175,15 +175,51 @@ function handleProfiles(response, brand,propertyId) {
                         //console.log ("Brand before:" + JSON.stringify(brand));
                         var esBrand = brand.toObject();
                         delete esBrand["_id"]; 
-                        esBrand._id = brand.account_id;
+                        //esBrand._id = brand.account_id;
                         //console.log ("Brand after:" + JSON.stringify(esBrand)); 
 
-                        //index  brand into elastic                        
+                        //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
                         ES.index('brands','brand',esBrand);
 
                         //start off the get GA process for the brand
-                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1825DaysAgo&endDate=today', esBrand, function(response) {
-                            console.log("Response from syncAPIPost is:" + response);
+                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=2DaysAgo&endDate=today', esBrand, function(response) {
+                            console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+                            
+                            //update the brand with GA count info
+
+
+                 if (response != 'undefined' && response.account_id) {
+                                        Brand.findOne({
+                                                account_id: response.account_id
+                                            }, function(err, doc) {
+                                                if (!err) {
+                                                    //set update values here
+                                                    doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
+                                                    doc.account_oauthtoken = response.account_oauthtoken;
+                                                    doc.status='Processed';
+                                                    doc.account_record_lastrefresh = response.account_record_lastrefresh;
+                                                    doc.save((err) => {
+                                                            if (err) {
+                                                                console.log(err);
+                                                                return next(err);
+                                                            }                                                        
+                                                    });
+                                            }
+                                        });
+                                }
+
+
+
+
+
+
+
+
+
+
+
+
+
                         });                       
                     }
                 });

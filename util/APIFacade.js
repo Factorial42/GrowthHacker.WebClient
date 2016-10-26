@@ -3,7 +3,9 @@ var async = require('async');
 
 function ping(url,callback){
     request(url, function(error, response, body) {
-        return callback(response.statusCode);
+        if (!error)
+            return callback(response.statusCode);
+        else console.log(error);
     });
 }
 
@@ -13,7 +15,7 @@ function syncAPIGet(url,callback) {
         if (!error && response.statusCode == 200) {
             //console.log(body)
             return callback(body);
-        } else console.log(response.statusCode);
+        } else console.log(error);
     });
 }
 
