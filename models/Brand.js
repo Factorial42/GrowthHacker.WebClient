@@ -8,7 +8,6 @@ const brandSchema = new mongoose.Schema({
 	account_source: String,
 	account_created: Date,
 	account_updated: Date,
-	account_tether_refresh_datetime: Date,
   	account_oauthtoken: String,
   	account_refresh_oauthtoken: String,
   	account_website_url: String,
@@ -19,6 +18,8 @@ const brandSchema = new mongoose.Schema({
 	account_tetherer_email: String,
 	account_record_total: { type: Number, default: 0 },
 	account_record_lastrefresh: { type: Number, default: 0 },
+	account_ingest_status: { type: String, default: 'Enqueued' }, //[Success, Failure for the base load as well as last run]
+	account_tether_refresh_datetime: Date,
 	account_dashboard_types: [],
   	views: [{
     view_id: String,
