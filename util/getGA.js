@@ -1,6 +1,6 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
-
+const API = require('../util/APIFacade.js');
 const ES = require('../util/es.js');
 const Brand = require('../models/Brand.js');
 const OAuth2 = googleapis.auth.OAuth2;
@@ -175,8 +175,16 @@ function handleProfiles(response, brand,propertyId) {
                         //console.log ("Brand before:" + JSON.stringify(brand));
                         var esBrand = brand.toObject();
                         delete esBrand["_id"]; 
-                        //console.log ("Brand after:" + JSON.stringify(esBrand));                         
+                        esBrand._id = brand.account_id;
+                        //console.log ("Brand after:" + JSON.stringify(esBrand)); 
+
+                        //index  brand into elastic                        
                         ES.index('brands','brand',esBrand);
+
+                        //start off the get GA process for the brand
+                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1825DaysAgo&endDate=today', esBrand, function(response) {
+                            console.log("Response from syncAPIPost is:" + response);
+                        });                       
                     }
                 });
             }

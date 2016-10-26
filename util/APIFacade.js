@@ -1,12 +1,17 @@
 var request = require('request');
 var async = require('async');
 
-//Sample GET
+function ping(url,callback){
+    request(url, function(error, response, body) {
+        return callback(response.statusCode);
+    });
+}
 
+//Sample GET
 function syncAPIGet(url,callback) {
     request(url, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-            //console.log(body) // Print the google web page.
+            //console.log(body)
             return callback(body);
         } else console.log(response.statusCode);
     });
@@ -92,6 +97,8 @@ function wait(ms) {
         end = new Date().getTime();
     }
 }
+
+module.exports.ping = ping;
 module.exports.asyncAPICall = asyncAPICall;
 module.exports.syncAPIGet = syncAPIGet;
 module.exports.syncAPIPost = syncAPIPost;

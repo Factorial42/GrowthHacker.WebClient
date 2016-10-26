@@ -1,7 +1,10 @@
 /**
  * Module dependencies.
  */
+//custom imports
 const ES = require('./util/es.js');
+const API = require('./util/APIFacade.js');
+
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
@@ -68,6 +71,17 @@ if (ES.ping())
 else
   console.log('%s ElasticSearch connection established to ==> ' + process.env.ELASTICHOSTANDPORT + '!', chalk.green('✓'));
 
+/*
+* Connect to API Service
+*/
+
+API.ping(process.env.API_SERVICE_ENDPOINT,function(response){
+  //console.log("Response is: " + response);
+  if (response)
+    console.log('%s API Service connection established to ==> ' + process.env.API_SERVICE_ENDPOINT + '!', chalk.green('✓'));
+  else
+    console.log('%s API Service Connection error! Please make sure ' + process.env.API_SERVICE_ENDPOINT + ' is running.', chalk.red('✗'));
+});
 /**
  * Express configuration.
  */

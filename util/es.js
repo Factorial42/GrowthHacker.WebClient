@@ -22,7 +22,7 @@ function index(indexName, indexType, object) {
     //console.log(JSON.stringify(object));
     client.index({
         index: indexName,
-        id: object.account_id,
+        _id: object.account_id,
         type: indexType,
         body:
             object

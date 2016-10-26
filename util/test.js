@@ -53,3 +53,5 @@ Brand.findOne({
         throw err;
     }
 });
+
+process.exit(0);
