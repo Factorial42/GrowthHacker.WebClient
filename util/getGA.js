@@ -182,7 +182,7 @@ function handleProfiles(response, brand,propertyId) {
                         ES.index('brands','brand',esBrand);
 
                         //start off the get GA process for the brand
-                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=2DaysAgo&endDate=today', esBrand, function(response) {
+                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1095DaysAgo&endDate=today', esBrand, function(response) {
                             console.log("Response from syncAPIPost is:" + JSON.stringify(response));
                             
                             //update the brand with GA count info
@@ -196,9 +196,10 @@ function handleProfiles(response, brand,propertyId) {
                                                     //set update values here & save the doc
                                                     doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
                                                     doc.account_oauthtoken = response.account_oauthtoken;
-                                                    doc.account_ingest_status = 'Processed';
+                                                    doc.account_ingest_status = response.account_record_lastrefresh_status;
                                                     doc.account_record_lastrefresh = response.account_record_lastrefresh;
-                                                    doc.account_record_total = response.account_record_lastrefresh;
+                                                    doc.account_record_total += response.account_record_lastrefresh;
+                                                    //doc.account_tether_refresh_datetime = Date.now;
                                                     doc.save((err) => {
                                                             if (err) {
                                                                 console.log(err);
