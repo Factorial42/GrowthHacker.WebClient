@@ -193,11 +193,12 @@ function handleProfiles(response, brand,propertyId) {
                                                 account_id: response.account_id
                                             }, function(err, doc) {
                                                 if (!err) {
-                                                    //set update values here
+                                                    //set update values here & save the doc
                                                     doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
                                                     doc.account_oauthtoken = response.account_oauthtoken;
-                                                    doc.status='Processed';
+                                                    doc.account_ingest_status = 'Processed';
                                                     doc.account_record_lastrefresh = response.account_record_lastrefresh;
+                                                    doc.account_record_total = response.account_record_lastrefresh;
                                                     doc.save((err) => {
                                                             if (err) {
                                                                 console.log(err);

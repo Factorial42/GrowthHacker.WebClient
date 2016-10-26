@@ -13,9 +13,10 @@ block content
 			th Name    
 			th Website     
 			th Dashboard
-			th GA Profile 
+			th Status 
 			th Tags  			
-			th Types  			
+			th Types 
+			th Records 			
 		tr
 		tbody
 			for brand in brands
@@ -29,9 +30,10 @@ block content
 					else
 							td Not Set 
 					
-					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_default_profile_id
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_ingest_status
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags			
-					td= brand.account_dashboard_types
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_dashboard_types			
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_record_lastrefresh			
 				tr
 			else
 				tr
