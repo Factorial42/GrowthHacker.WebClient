@@ -17,13 +17,14 @@ function syncAPIPost(url, Object,callback) {
     console.log ("URL:" + url);
     console.log("Object:" + JSON.stringify(Object));
  
-    request.post(
-        url, JSON.stringify(Object),
+    request.post({
+        url:url, 
+        json: Object},
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
             console.log(body);
             return callback(body);
-        }else console.log(response.statusCode);
+        }else console.log('Somethin Wong!');
     }
 );
 }
