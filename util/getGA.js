@@ -182,6 +182,7 @@ function handleProfiles(response, brand,propertyId) {
                         ES.index('brands','brand',esBrand);
 
                         //start off the get GA process for the brand
+                        esBrand._id = brand.account_id; //set the id back for API service call
                         API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1095DaysAgo&endDate=today', esBrand, function(response) {
                             console.log("Response from syncAPIPost is:" + JSON.stringify(response));
                             

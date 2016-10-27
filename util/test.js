@@ -46,12 +46,10 @@ Brand.findOne({
 
 
         //console.log("Brand for ingest: " + doc);
-        API.syncAPIPost('http://localhost:8080/googleAnalytics/ingestData?startDate=2DaysAgo&endDate=today', _doc, function(response) {
+        API.syncAPIPost('http://localhost:8080/googleAnalytics/ingestData?startDate=1DaysAgo&endDate=today', _doc, function(response) {
             console.log("Response from syncAPIPost is:" + response);
         });
     } else {
         throw err;
     }
 });
-
-process.exit(0);

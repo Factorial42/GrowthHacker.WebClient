@@ -1,9 +1,9 @@
 {
-  "name": "hackathon-starter",
+  "name": "GrowthHacker",
   "version": "4.2.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+    "url": "https://github.com/Factorial42/GrowthHacker.WebClient.git"
   },
   "scripts": {
     "start": "node app.js",
