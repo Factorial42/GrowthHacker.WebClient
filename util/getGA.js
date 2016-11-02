@@ -1,5 +1,7 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
+var sleep = require('sleep');
+
 const API = require('../util/APIFacade.js');
 const ES = require('../util/es.js');
 const Brand = require('../models/Brand.js');
@@ -28,6 +30,7 @@ function getGA(accessToken,refreshToken,userEmail) {
         };
         console.log(oauth2Client);
 
+        sleep.sleep(1); // sleep for one second
 
         analytics.management.accounts.list({
             'auth': oauth2Client
@@ -79,6 +82,9 @@ function handleAccounts(response,userEmail) {
 function queryProperties(accountId, brand) {
     //console.log("Brand is:: " + JSON.stringify(brand));
     // Get a list of all the properties for the account.
+
+    sleep.sleep(1); // sleep for one second
+
     analytics.management.webproperties.list({
         'accountId': accountId,
         'auth': oauth2Client
@@ -129,6 +135,9 @@ function handleProperties(response, brand) {
 function queryProfiles(accountId, propertyId, brand) {
     // Get a list of all Views (Profiles) for the first property
     // of the first Account.
+
+    sleep.sleep(1); // sleep for one second
+
     analytics.management.profiles.list({
         'accountId': accountId,
         'webPropertyId': propertyId,
