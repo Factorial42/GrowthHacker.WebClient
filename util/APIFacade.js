@@ -21,17 +21,17 @@ function syncAPIGet(url,callback) {
 
 //Sample POST
 function syncAPIPost(url, Object,callback) {
-    console.log ("URL:" + url);
-    console.log("Object:" + JSON.stringify(Object));
+    //console.log ("URL:" + url);
+    //console.log("Object:" + JSON.stringify(Object));
  
     request.post({
         url:url, 
         json: Object},
     function (error, response, body) {
-        if (!error && response.statusCode == 200) {
+        if (!error && (response.statusCode == 200 || response.statusCode == 201)) {
             console.log(body);
             return callback(body);
-        }else console.log('Somethin Wong!');
+        }else console.log('Somethin Wong! :: ' + response.statusCode);
     }
 );
 }

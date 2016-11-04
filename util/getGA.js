@@ -1,5 +1,6 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
+var deasync = require('deasync');
 
 const API = require('../util/APIFacade.js');
 const ES = require('../util/es.js');
@@ -7,7 +8,12 @@ const Brand = require('../models/Brand.js');
 const OAuth2 = googleapis.auth.OAuth2;
 
 
-//Setup oAuth for testing
+//setup deasync for the 3 calls we need for GA
+var accountsList = deasync(analytics.management.accounts.list);
+var webpropertiesList = deasync(analytics.management.webproperties.list);
+var profilesList = deasync(analytics.management.profiles.list);
+
+//Setup oAuth
 const oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
 
 //GA Tokens
@@ -29,18 +35,21 @@ function getGA(accessToken, refreshToken, userEmail) {
         };
         console.log(oauth2Client);
 
+        try {
+            var accountListsResponse = accountsList({
+                'auth': oauth2Client,
+                'quotaUser': userEmail
+            });
 
-        analytics.management.accounts.list({
-            'auth': oauth2Client,
-            'quotaUser': userEmail
-        }, function(error, response) {
-            if (error) {
-                console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
-                console.log(error);
-            } else {
-                handleAccounts(response, userEmail);
-            }
-        });
+            if (accountListsResponse != 'undefined' && accountListsResponse.items && accountListsResponse.items.length)
+                handleAccounts(accountListsResponse, userEmail);
+            else
+                console.log("Google Management API returned 0 Accounts");
+        } catch (err) {
+            console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
+            console.log(err);
+        }
+
     }
 }
 
@@ -72,7 +81,6 @@ function handleAccounts(response, userEmail) {
             }
         }
         console.log("*******************ACCOUNTS******************");
-
     } else {
         console.log('No GA Accounts found for this user.');
     }
@@ -81,24 +89,21 @@ function handleAccounts(response, userEmail) {
 function queryProperties(accountId, brand) {
     //console.log("Brand is:: " + JSON.stringify(brand));
     // Get a list of all the properties for the account.
-    var sync = true;
-    var webPropResponse = null;
-    analytics.management.webproperties.list({
-        'accountId': accountId,
-        'quotaUser': accountId,
-        'auth': oauth2Client
-    }, function(error, response) {
-        if (error) {
-            console.log(error);
-        } else {
-            webPropResponse = response;
-            sync = false;
-        }
-    });
-    while (sync) {
-        require('deasync').sleep(100);
+
+    try {
+        var webpropertiesResponse = webpropertiesList({
+            'accountId': accountId,
+            'quotaUser': accountId,
+            'auth': oauth2Client
+        });
+        if (webpropertiesResponse != 'undefined' && webpropertiesResponse.items && webpropertiesResponse.items.length)
+            handleProperties(webpropertiesResponse, brand);
+        else
+            console.log("Google API queryProperties returned empty results");
+
+    } catch (err) {
+        console.log(err);
     }
-    handleProperties(webPropResponse, brand);
 }
 
 function handleProperties(response, brand) {
@@ -139,29 +144,22 @@ function handleProperties(response, brand) {
 function queryProfiles(accountId, propertyId, brand) {
     // Get a list of all Views (Profiles) for the first property
     // of the first Account.
-    var sync = true;
-    var profileResponse = null;
 
-    analytics.management.profiles.list({
-        'accountId': accountId,
-        'quotaUser': accountId,
-        'webPropertyId': propertyId,
-        'auth': oauth2Client
+    try {
+        var profilesListResponse = profilesList({
+            'accountId': accountId,
+            'quotaUser': accountId,
+            'webPropertyId': propertyId,
+            'auth': oauth2Client
 
-    }, function(error, response) {
-        if (error) {
-            console.log("Eror in queryProfiles");
-            console.log(error);
-        } else {
-            profileResponse = response;
-            sync = false;
-
-        }
-    });
-    while (sync) {
-        require('deasync').sleep(100);
+        });
+        if (profilesListResponse != 'undefined' && profilesListResponse.items && profilesListResponse.items.length)
+            handleProfiles(profilesListResponse, brand, propertyId);
+        else
+            console.log("Google API queryProfiles returned empty results");
+    } catch (err) {
+        console.log(err);
     }
-    handleProfiles(profileResponse, brand, propertyId);
 }
 
 
