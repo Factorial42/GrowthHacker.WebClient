@@ -1,7 +1,12 @@
+var googleapis = require('googleapis');
+var analytics = googleapis.analytics('v3');
 const Brand = require('../models/Brand.js');
 const ES = require('../util/es.js');
+const GA = require('../util/getGA.js');
 const API = require('../util/APIFacade.js');
 const mongoose = require('mongoose');
+const OAuth2 = googleapis.auth.OAuth2;
+
 
 //Ensure connection to DB for play
 mongoose.Promise = global.Promise;
@@ -14,6 +19,43 @@ mongoose.connection.on('error', () => {
     process.exit();
 });
 
+
+
+//Call stack
+
+//run first to refresh token
+//refreshOauth2Token('ya29.CjCKAwEHnvCj5dijpHsPacWPmBz50jhUm99j4lUcnNtXE65WmIpd1r5jMfVwL3MJdBQ',
+//    '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN');
+
+// call sequential GA test
+loadGASeqTest();
+
+
+
+
+//util test functions
+
+function refreshOauth2Token(accessToken, refreshToken) {
+    const oauth2Client = new OAuth2('686502966146-42artrbsiu82metst7r9n317p2bueq1n.apps.googleusercontent.com',
+        'GNUm2ai-CwlE4drmx8UoW0mI', 'http://localhost/auth/google/callback');
+    oauth2Client.credentials = {
+        //access_token: 'ya29.Ci9_Aws_eMxjJ_xM5zkrNlxnkPfNjr8QxKcY8diziZNRTEi5mj2JXh0gXthhhmRNHg',
+        access_token: accessToken,
+        refresh_token: refreshToken,
+    };
+    console.log(oauth2Client);
+    oauth2Client.refreshAccessToken(function(err, tokens) {
+        // your access_token is now refreshed and stored in oauth2Client
+        // store these new tokens in a safe place (e.g. database)
+        console.log(oauth2Client);
+
+    });
+}
+
+function loadGASeqTest() {
+    GA.getGA('ya29.CjCKA29pkzk_amjQlACXcVQuYchCDPW1I7A4r4fHDbUcGGEgP74214vttQO4bPDttXw',
+        '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN', 'info@hawkemedia.com');
+}
 
 function esTest() {
     var brand = new Brand();
@@ -34,6 +76,7 @@ API.syncAPIGet('http://growthhacker.f42labs.com:9200/', function(response) {
 
 
 //Sample POST Test
+/*
 Brand.findOne({
     account_id: '61002524'
 }, function(err, doc) {
@@ -53,3 +96,4 @@ Brand.findOne({
         throw err;
     }
 });
+*/

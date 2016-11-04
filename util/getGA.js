@@ -1,6 +1,5 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
-var sleep = require('sleep');
 
 const API = require('../util/APIFacade.js');
 const ES = require('../util/es.js');
@@ -9,14 +8,14 @@ const OAuth2 = googleapis.auth.OAuth2;
 
 
 //Setup oAuth for testing
-const oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost:3000/auth/google/callback');
+const oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
 
 //GA Tokens
 var gaToken;
 var gaRefreshToken;
 var prevAccount = new String();
 
-function getGA(accessToken,refreshToken,userEmail) {
+function getGA(accessToken, refreshToken, userEmail) {
     if (accessToken) {
         gaToken = accessToken;
         gaRefreshToken = refreshToken;
@@ -30,29 +29,29 @@ function getGA(accessToken,refreshToken,userEmail) {
         };
         console.log(oauth2Client);
 
-        sleep.sleep(1); // sleep for one second
 
         analytics.management.accounts.list({
-            'auth': oauth2Client
+            'auth': oauth2Client,
+            'quotaUser': userEmail
         }, function(error, response) {
             if (error) {
                 console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
                 console.log(error);
             } else {
-                handleAccounts(response,userEmail);
+                handleAccounts(response, userEmail);
             }
         });
     }
 }
 
 //GA Crap
-function handleAccounts(response,userEmail) {
+function handleAccounts(response, userEmail) {
     // Handles the response from the accounts list method.
     if (response.items && response.items.length) {
         console.log("*******************ACCOUNTS******************");
         for (var p in response.items) {
             if (response.items.hasOwnProperty(p)) {
-             //console.log(p + " , " + JSON.stringify(response.items[p]) + "\n");
+                //console.log(p + " , " + JSON.stringify(response.items[p]) + "\n");
                 console.log(response.items[p].name + "\n");
 
                 //Create and save Brand Document
@@ -82,19 +81,24 @@ function handleAccounts(response,userEmail) {
 function queryProperties(accountId, brand) {
     //console.log("Brand is:: " + JSON.stringify(brand));
     // Get a list of all the properties for the account.
-
-    sleep.sleep(1); // sleep for one second
-
+    var sync = true;
+    var webPropResponse = null;
     analytics.management.webproperties.list({
         'accountId': accountId,
+        'quotaUser': accountId,
         'auth': oauth2Client
     }, function(error, response) {
         if (error) {
             console.log(error);
         } else {
-            handleProperties(response, brand);
+            webPropResponse = response;
+            sync = false;
         }
     });
+    while (sync) {
+        require('deasync').sleep(100);
+    }
+    handleProperties(webPropResponse, brand);
 }
 
 function handleProperties(response, brand) {
@@ -135,11 +139,12 @@ function handleProperties(response, brand) {
 function queryProfiles(accountId, propertyId, brand) {
     // Get a list of all Views (Profiles) for the first property
     // of the first Account.
-
-    sleep.sleep(1); // sleep for one second
+    var sync = true;
+    var profileResponse = null;
 
     analytics.management.profiles.list({
         'accountId': accountId,
+        'quotaUser': accountId,
         'webPropertyId': propertyId,
         'auth': oauth2Client
 
@@ -148,13 +153,19 @@ function queryProfiles(accountId, propertyId, brand) {
             console.log("Eror in queryProfiles");
             console.log(error);
         } else {
-            handleProfiles(response, brand,propertyId);
+            profileResponse = response;
+            sync = false;
+
         }
     });
+    while (sync) {
+        require('deasync').sleep(100);
+    }
+    handleProfiles(profileResponse, brand, propertyId);
 }
 
 
-function handleProfiles(response, brand,propertyId) {
+function handleProfiles(response, brand, propertyId) {
     // Handles the response from the profiles list method.
     if (response.items && response.items.length) {
         console.log("*******************PROFILES******************");
@@ -174,65 +185,56 @@ function handleProfiles(response, brand,propertyId) {
                     view_ecommerce_tracking: response.items[p].eCommerceTracking,
                     view_enhanced_ecommerce_tracking: response.items[p].enhancedECommerceTracking
                 });
-              }
-                //finally save the brand
-                if ( brand.account_native_id.valueOf() != prevAccount && !doesBrandAccountExist(brand.account_id)){
-                    prevAccount = brand.account_native_id;
-                    brand.save(function(err) {
+            }
+            //finally save the brand
+            if (brand.account_native_id.valueOf() != prevAccount && !doesBrandAccountExist(brand.account_id)) {
+                prevAccount = brand.account_native_id;
+                brand.save(function(err) {
                     if (err) console.log('Error saving brand' + err);
-                    else{
+                    else {
                         //console.log ("Brand before:" + JSON.stringify(brand));
                         var esBrand = brand.toObject();
-                        delete esBrand["_id"]; 
+                        delete esBrand["_id"];
                         //esBrand._id = brand.account_id;
                         //console.log ("Brand after:" + JSON.stringify(esBrand)); 
 
                         //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
-                        ES.index('brands','brand',esBrand);
+                        ES.index('brands', 'brand', esBrand);
 
                         //start off the get GA process for the brand
                         esBrand._id = brand.account_id; //set the id back for API service call
                         API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1095DaysAgo&endDate=today', esBrand, function(response) {
                             console.log("Response from syncAPIPost is:" + JSON.stringify(response));
-                            
+
                             //update the brand with GA count info
 
 
-                 if (response != 'undefined' && response.account_id) {
-                                        Brand.findOne({
-                                                account_id: response.account_id
-                                            }, function(err, doc) {
-                                                if (!err) {
-                                                    //set update values here & save the doc
-                                                    doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
-                                                    doc.account_oauthtoken = response.account_oauthtoken;
-                                                    doc.account_ingest_status = response.account_record_lastrefresh_status;
-                                                    doc.account_record_lastrefresh = response.account_record_lastrefresh;
-                                                    doc.account_record_total += response.account_record_lastrefresh;
-                                                    //doc.account_tether_refresh_datetime = Date.now;
-                                                    doc.save((err) => {
-                                                            if (err) {
-                                                                console.log(err);
-                                                                return next(err);
-                                                            }                                                        
-                                                    });
+                            if (response != 'undefined' && response.account_id) {
+                                Brand.findOne({
+                                    account_id: response.account_id
+                                }, function(err, doc) {
+                                    if (!err) {
+                                        //set update values here & save the doc
+                                        doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
+                                        doc.account_oauthtoken = response.account_oauthtoken;
+                                        doc.account_ingest_status = response.account_record_lastrefresh_status;
+                                        doc.account_record_lastrefresh = response.account_record_lastrefresh;
+                                        doc.account_record_total += response.account_record_lastrefresh;
+                                        //doc.account_tether_refresh_datetime = Date.now;
+                                        doc.save((err) => {
+                                            if (err) {
+                                                console.log(err);
+                                                return next(err);
                                             }
                                         });
-                                }
+                                    }
+                                });
+                            }
 
 
 
 
-
-
-
-
-
-
-
-
-
-                        });                       
+                        });
                     }
                 });
             }
@@ -268,19 +270,19 @@ function queryCoreReportingApi(profileId) {
     });
 }
 
-function doesBrandAccountExist(brandId){
+function doesBrandAccountExist(brandId) {
     //console.log("doesBrandAccountExist in getGA.js:: " + brandId);
     var status = false;
     Brand.find((err, brands) => {
         if (err) console.log(err);
-    for (var i = 0; i < brands.length; i++) {
-        if (brands[i].account_id == brandId) {
-            console.log("doesBrandAccountExist loop:: " + brands[i].account_id + " <=>" + brandId);        
-        status = true;
+        for (var i = 0; i < brands.length; i++) {
+            if (brands[i].account_id == brandId) {
+                console.log("doesBrandAccountExist loop:: " + brands[i].account_id + " <=>" + brandId);
+                status = true;
+            }
         }
-    }       
-});
-     return status;
+    });
+    return status;
 }
 
 module.exports.getGA = getGA;
