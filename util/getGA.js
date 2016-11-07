@@ -13,9 +13,6 @@ var accountsList = deasync(analytics.management.accounts.list);
 var webpropertiesList = deasync(analytics.management.webproperties.list);
 var profilesList = deasync(analytics.management.profiles.list);
 
-//Setup oAuth
-const oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
-
 //GA Tokens
 var gaToken;
 var gaRefreshToken;
@@ -28,13 +25,13 @@ function getGA(accessToken, refreshToken, userEmail) {
         console.log("GetGA Request Params::GA Tokens:" + accessToken + " : " + refreshToken + "Tetherer Email:" + userEmail);
 
         //set/read token from DB/session clean up later
+	var oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
         oauth2Client.credentials = {
             //access_token: 'ya29.Ci9_Aws_eMxjJ_xM5zkrNlxnkPfNjr8QxKcY8diziZNRTEi5mj2JXh0gXthhhmRNHg',
             access_token: accessToken,
             refresh_token: refreshToken,
         };
         console.log(oauth2Client);
-
         try {
             var accountListsResponse = accountsList({
                 'auth': oauth2Client,
@@ -42,7 +39,7 @@ function getGA(accessToken, refreshToken, userEmail) {
             });
 
             if (accountListsResponse != 'undefined' && accountListsResponse.items && accountListsResponse.items.length)
-                handleAccounts(accountListsResponse, userEmail);
+                handleAccounts(oauth2Client, accountListsResponse, userEmail);
             else
                 console.log("Google Management API returned 0 Accounts");
         } catch (err) {
@@ -54,7 +51,7 @@ function getGA(accessToken, refreshToken, userEmail) {
 }
 
 //GA Crap
-function handleAccounts(response, userEmail) {
+function handleAccounts(oauth2Client, response, userEmail) {
     // Handles the response from the accounts list method.
     if (response.items && response.items.length) {
         console.log("*******************ACCOUNTS******************");
@@ -77,7 +74,7 @@ function handleAccounts(response, userEmail) {
                 brand.account_refresh_oauthtoken = gaRefreshToken;
 
                 //   for each account query for properties
-                queryProperties(response.items[p].id, brand);
+                queryProperties(oauth2Client,response.items[p].id, brand);
             }
         }
         console.log("*******************ACCOUNTS******************");
@@ -86,18 +83,19 @@ function handleAccounts(response, userEmail) {
     }
 }
 
-function queryProperties(accountId, brand) {
+function queryProperties(oauth2Client, accountId, brand) {
     //console.log("Brand is:: " + JSON.stringify(brand));
     // Get a list of all the properties for the account.
 
     try {
-        var webpropertiesResponse = webpropertiesList({
+        console.log("Getting properties for accountId:"+accountId+ " with auth:"+JSON.stringify(oauth2Client));
+	var webpropertiesResponse = webpropertiesList({
             'accountId': accountId,
             'quotaUser': accountId,
             'auth': oauth2Client
         });
         if (webpropertiesResponse != 'undefined' && webpropertiesResponse.items && webpropertiesResponse.items.length)
-            handleProperties(webpropertiesResponse, brand);
+            handleProperties(oauth2Client, webpropertiesResponse, brand);
         else
             console.log("Google API queryProperties returned empty results");
 
@@ -106,7 +104,7 @@ function queryProperties(accountId, brand) {
     }
 }
 
-function handleProperties(response, brand) {
+function handleProperties(oauth2Client, response, brand) {
     // Handles the response from the webproperties list method.
     if (response.items && response.items.length) {
         console.log("*******************PROPERTIES******************");
@@ -121,7 +119,7 @@ function handleProperties(response, brand) {
                 brand.account_tags.push(response.items[p].industryVertical);
                 brand.account_website_url = response.items[p].websiteUrl;
                 brand.account_default_profile_id = response.items[p].defaultProfileId;
-                brand = queryProfiles(response.items[p].accountId, response.items[p].id, brand);
+                brand = queryProfiles(oauth2Client, response.items[p].accountId, response.items[p].id, brand);
             }
         }
 	
@@ -191,7 +189,7 @@ function handleProperties(response, brand) {
 }
 
 
-function queryProfiles(accountId, propertyId, brand) {
+function queryProfiles(oauth2Client, accountId, propertyId, brand) {
     // Get a list of all Views (Profiles) for the first property
     // of the first Account.
 
