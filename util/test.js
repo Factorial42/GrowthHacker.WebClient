@@ -24,11 +24,11 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
-//refreshOauth2Token('ya29.CjCKAwEHnvCj5dijpHsPacWPmBz50jhUm99j4lUcnNtXE65WmIpd1r5jMfVwL3MJdBQ',
-//    '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN');
+refreshOauth2Token('ya29.CjCKAwEHnvCj5dijpHsPacWPmBz50jhUm99j4lUcnNtXE65WmIpd1r5jMfVwL3MJdBQ',
+    '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN');
 
 // call sequential GA test
-loadGASeqTest();
+//loadGASeqTest();
 
 
 
@@ -43,7 +43,7 @@ function refreshOauth2Token(accessToken, refreshToken) {
         access_token: accessToken,
         refresh_token: refreshToken,
     };
-    console.log(oauth2Client);
+    //console.log(oauth2Client);
     oauth2Client.refreshAccessToken(function(err, tokens) {
         // your access_token is now refreshed and stored in oauth2Client
         // store these new tokens in a safe place (e.g. database)
@@ -53,7 +53,7 @@ function refreshOauth2Token(accessToken, refreshToken) {
 }
 
 function loadGASeqTest() {
-    GA.getGA('ya29.CjCKA29pkzk_amjQlACXcVQuYchCDPW1I7A4r4fHDbUcGGEgP74214vttQO4bPDttXw',
+    GA.getGA('ya29.CjCKAxRtUw0YZqztp1XoljDZjn_uF-NVO4cqxqO2G0nc88j3Jed8ROaZpIVW-yUBmcA',
         '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN', 'info@hawkemedia.com');
 }
 

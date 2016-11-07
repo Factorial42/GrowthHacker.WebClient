@@ -1,16 +1,8 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
 
+const loadGATest = require('../util/getGATest.js');
 const Brand = require('../models/Brand.js');
-const OAuth2 = googleapis.auth.OAuth2;
-
-//Setup oAuth for testing
-const oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost:3000/auth/google/callback');
-
-//GA Tokens
-var gaToken;
-var gaRefreshToken;
-
 
 exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
@@ -37,6 +29,21 @@ exports.getBrands = (req, res) => {
         });
     });
 };
+
+
+/**
+ * GET /loadga
+ * Load a test case for all brands attached to info.
+ */
+exports.loadGA = (req, res) => {
+    Brand.find((err, docs) => {
+    loadGATest.getGATest();        
+        res.render('brands', {
+            brands: docs
+        });
+    });
+};
+
 
 /**
  * GET /brands

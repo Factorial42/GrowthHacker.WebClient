@@ -1,4 +1,4 @@
-const GA = require('../util/getGA.js'); //Hack for now
+const GA = require('../util/getGA.js');
 const _ = require('lodash');
 const passport = require('passport');
 const request = require('request');
