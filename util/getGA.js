@@ -121,9 +121,59 @@ function handleProperties(response, brand) {
                 brand.account_tags.push(response.items[p].industryVertical);
                 brand.account_website_url = response.items[p].websiteUrl;
                 brand.account_default_profile_id = response.items[p].defaultProfileId;
-                brand.account_native_id = response.items[p].id;
-                queryProfiles(response.items[p].accountId, response.items[p].id, brand);
+                brand = queryProfiles(response.items[p].accountId, response.items[p].id, brand);
             }
+        }
+	
+            //finally save the brand
+        if (!doesBrandAccountExist(brand.account_id)) {
+            brand.save(function(err) {
+                if (err) console.log('Error saving brand' + err);
+                else {
+                    //console.log ("Brand before:" + JSON.stringify(brand));
+                    var esBrand = brand.toObject();
+                    delete esBrand["_id"];
+                    //esBrand._id = brand.account_id;
+                    //console.log ("Brand after:" + JSON.stringify(esBrand)); 
+
+                    //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
+                    ES.index('brands', 'brand', esBrand);
+		    console.log("Indexing brand:"+ JSON.stringify(esBrand));
+
+                    //start off the get GA process for the brand
+                    esBrand._id = brand.account_id; //set the id back for API service call
+			
+		    console.log("Calling API: "+JSON.stringify(esBrand));
+
+                    API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1095DaysAgo&endDate=today', esBrand, function(response) {
+                        console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+
+                        //update the brand with GA count info
+
+                        if (response != 'undefined' && response.account_id) {
+                            Brand.findOne({
+                                account_id: response.account_id
+                            }, function(err, doc) {
+                                if (!err) {
+                                    //set update values here & save the doc
+                                    doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
+                                    doc.account_oauthtoken = response.account_oauthtoken;
+                                    doc.account_ingest_status = response.account_record_lastrefresh_status;
+                                    doc.account_record_lastrefresh = response.account_record_lastrefresh;
+                                    doc.account_record_total += response.account_record_lastrefresh;
+                                    //doc.account_tether_refresh_datetime = Date.now;
+                                    doc.save((err) => {
+                                        if (err) {
+                                            console.log(err);
+                                            return next(err);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         }
         console.log("*******************PROPERTIES******************");
 
@@ -153,8 +203,10 @@ function queryProfiles(accountId, propertyId, brand) {
             'auth': oauth2Client
 
         });
-        if (profilesListResponse != 'undefined' && profilesListResponse.items && profilesListResponse.items.length)
-            handleProfiles(profilesListResponse, brand, propertyId);
+        if (profilesListResponse != 'undefined' && profilesListResponse.items && profilesListResponse.items.length) {
+            brand = handleProfiles(profilesListResponse, brand, propertyId);
+	    return brand;
+	}
         else
             console.log("Google API queryProfiles returned empty results");
     } catch (err) {
@@ -174,6 +226,7 @@ function handleProfiles(response, brand, propertyId) {
 
                 //Construct a view and push into Brand object
                 brand.views.push({
+		    view_native_id: propertyId, 
                     view_id: response.items[p].id,
                     view_name: response.items[p].name,
                     view_tethered_user_email: response.username,
@@ -184,59 +237,8 @@ function handleProfiles(response, brand, propertyId) {
                     view_enhanced_ecommerce_tracking: response.items[p].enhancedECommerceTracking
                 });
             }
-            //finally save the brand
-            if (brand.account_native_id.valueOf() != prevAccount && !doesBrandAccountExist(brand.account_id)) {
-                prevAccount = brand.account_native_id;
-                brand.save(function(err) {
-                    if (err) console.log('Error saving brand' + err);
-                    else {
-                        //console.log ("Brand before:" + JSON.stringify(brand));
-                        var esBrand = brand.toObject();
-                        delete esBrand["_id"];
-                        //esBrand._id = brand.account_id;
-                        //console.log ("Brand after:" + JSON.stringify(esBrand)); 
-
-                        //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
-                        ES.index('brands', 'brand', esBrand);
-
-                        //start off the get GA process for the brand
-                        esBrand._id = brand.account_id; //set the id back for API service call
-                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1095DaysAgo&endDate=today', esBrand, function(response) {
-                            console.log("Response from syncAPIPost is:" + JSON.stringify(response));
-
-                            //update the brand with GA count info
-
-
-                            if (response != 'undefined' && response.account_id) {
-                                Brand.findOne({
-                                    account_id: response.account_id
-                                }, function(err, doc) {
-                                    if (!err) {
-                                        //set update values here & save the doc
-                                        doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
-                                        doc.account_oauthtoken = response.account_oauthtoken;
-                                        doc.account_ingest_status = response.account_record_lastrefresh_status;
-                                        doc.account_record_lastrefresh = response.account_record_lastrefresh;
-                                        doc.account_record_total += response.account_record_lastrefresh;
-                                        //doc.account_tether_refresh_datetime = Date.now;
-                                        doc.save((err) => {
-                                            if (err) {
-                                                console.log(err);
-                                                return next(err);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-
-
-
-
-                        });
-                    }
-                });
-            }
         }
+	return brand;
         console.log("*******************PROFILES******************");
 
 

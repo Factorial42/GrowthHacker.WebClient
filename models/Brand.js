@@ -13,7 +13,6 @@ const brandSchema = new mongoose.Schema({
   	account_website_url: String,
     account_industry_vertical: String,
     account_default_profile_id: String,
-    account_native_id: String,
 	account_tags: [],
 	account_tetherer_email: String,
 	account_record_total: { type: Number, default: 0 },
@@ -24,6 +23,7 @@ const brandSchema = new mongoose.Schema({
   	views: [{
     view_id: String,
     view_name: String,
+        view_native_id: String,
    	view_tethered_user_email: String,
    	view_currency: String,
    	view_timezone: String,
