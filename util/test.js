@@ -24,7 +24,7 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
-refreshOauth2Token('ya29.CjCPA1s8jjG4w6k4E0PCdDdy1wgg-9R2s2tTcS1lHBVD7j8wnU-0XBBzU1nONbkMaFA',
+refreshOauth2Token('ya29.CjCPA4-ecxwfALXA6EAZHVUVsSkIKnF0JvgkY9b99rmsP5OpDsATSBszNAVxVASTlyM',
     '');
 
 // call sequential GA test
@@ -47,7 +47,8 @@ function refreshOauth2Token(accessToken, refreshToken) {
     oauth2Client.refreshAccessToken(function(err, tokens) {
         // your access_token is now refreshed and stored in oauth2Client
         // store these new tokens in a safe place (e.g. database)
-        console.log(oauth2Client);
+        console.log ( err );
+        console.log("Refreshed token is :" + oauth2Client);
 
     });
 }

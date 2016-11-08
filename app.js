@@ -219,7 +219,7 @@ app.get('/auth/google', passport.authenticate('google', { scope: 'profile email'
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });
-app.get('/auth/googleanalytics', passport.authenticate('google', {accessType: 'offline', scope: 'https://www.googleapis.com/auth/analytics.readonly profile email' }));
+app.get('/auth/googleanalytics', passport.authenticate('google', {accessType: 'offline', scope: 'https://www.googleapis.com/auth/analytics.readonly profile email', approvalPrompt: 'force' }));
 app.get('/auth/google/callback', passport.authenticate('google', { successRedirect: '/brands',failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });
