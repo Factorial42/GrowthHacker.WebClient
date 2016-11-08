@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const GA = require('../util/getGA');
 
 /**
  * GET /login
@@ -309,6 +310,42 @@ exports.getForgot = (req, res) => {
     title: 'Forgot Password'
   });
 };
+
+
+/**
+ * GET /loadga
+ * Load a test case for all brands attached to info.
+ */
+exports.getloadGA = (req, res) => {
+    User.find((err, docs) => {
+    // Iterate through all accounts that have google analytics accounts
+    // and call load GA
+    if (docs != 'undefined' && docs.length > 0){
+      for (var i = 0; i < docs.length; i++) {
+        var aToken;
+        var rToken;
+        var uEmail;
+        var tokens = docs[i].tokens;
+          for (var j=0; j<tokens.length;j++){
+            //console.log('Token is:', docs[i].tokens[j].accessToken);
+            //console.log('Kind is:', docs[i].tokens[j].kind);
+            uEmail = docs[i].email;
+            if (docs[i].tokens[j].kind.toString() == 'google#analytics#access_token')
+              aToken = docs[i].tokens[j].accessToken;
+            if (docs[i].tokens[j].kind.toString() == 'google#analytics#refresh_token')
+              rToken = docs[i].tokens[j].refreshToken;         
+          }
+          if (aToken){
+            console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + aToken + " refreshToken :" + rToken); 
+            GA.getGA(aToken, rToken, uEmail);
+          }
+      }
+    }
+    //After done, just respond with a render to load brands page      
+        res.redirect('/brands');
+    });
+};
+
 
 /**
  * POST /forgot

@@ -1,7 +1,7 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
 
-const loadGATest = require('../util/getGATest.js');
+const GA = require('../util/getGA.js');
 const Brand = require('../models/Brand.js');
 
 exports.getBrandByBrandId = (req, res) => {
@@ -24,24 +24,6 @@ exports.getBrandByBrandId = (req, res) => {
  */
 exports.getBrands = (req, res) => {
     Brand.find((err, docs) => {
-        res.render('brands', {
-            brands: docs
-        });
-    });
-};
-
-
-/**
- * GET /loadga
- * Load a test case for all brands attached to info.
- */
-exports.getloadGA = (req, res) => {
-    Brand.find((err, docs) => {
-    // Iterate through all accounts that have google analytics accounts
-    // and call load GA
-    loadGATest.getGATest();  
-
-    //After done, just respond with a render to load brands page      
         res.render('brands', {
             brands: docs
         });

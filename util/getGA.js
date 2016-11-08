@@ -54,7 +54,7 @@ function getGA(accessToken, refreshToken, userEmail) {
 function handleAccounts(oauth2Client, response, userEmail) {
     // Handles the response from the accounts list method.
     if (response.items && response.items.length) {
-        console.log("*******************ACCOUNTS******************");
+        console.log("*******************ACCOUNTS::" + response.items.length + "******************");
         for (var p in response.items) {
             if (response.items.hasOwnProperty(p)) {
                 //console.log(p + " , " + JSON.stringify(response.items[p]) + "\n");
@@ -88,7 +88,7 @@ function queryProperties(oauth2Client, accountId, brand) {
     // Get a list of all the properties for the account.
 
     try {
-        console.log("Getting properties for accountId:"+accountId+ " with auth:"+JSON.stringify(oauth2Client));
+        //console.log("Getting properties for accountId:"+accountId+ " with auth:"+JSON.stringify(oauth2Client));
 	var webpropertiesResponse = webpropertiesList({
             'accountId': accountId,
             'quotaUser': accountId,
@@ -136,7 +136,7 @@ function handleProperties(oauth2Client, response, brand) {
 
                     //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
                     ES.index('brands', 'brand', esBrand);
-		    console.log("Indexing brand:"+ JSON.stringify(esBrand));
+		    //console.log("Indexing brand:"+ JSON.stringify(esBrand));
 
                     //start off the get GA process for the brand
                     esBrand._id = brand.account_id; //set the id back for API service call
