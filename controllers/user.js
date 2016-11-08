@@ -322,22 +322,20 @@ exports.getloadGA = (req, res) => {
     // and call load GA
     if (docs != 'undefined' && docs.length > 0){
       for (var i = 0; i < docs.length; i++) {
-        var aToken;
-        var rToken;
-        var uEmail;
         var tokens = docs[i].tokens;
           for (var j=0; j<tokens.length;j++){
             //console.log('Token is:', docs[i].tokens[j].accessToken);
             //console.log('Kind is:', docs[i].tokens[j].kind);
-            uEmail = docs[i].email;
-            if (docs[i].tokens[j].kind.toString() == 'google#analytics#access_token')
-              aToken = docs[i].tokens[j].accessToken;
+            var uEmail = docs[i].email;
+            if (docs[i].tokens[j].kind.toString() == 'google#analytics#access_token'){
+              var aToken = docs[i].tokens[j].accessToken;
             if (docs[i].tokens[j].kind.toString() == 'google#analytics#refresh_token')
-              rToken = docs[i].tokens[j].refreshToken;         
+              var rToken = docs[i].tokens[j].refreshToken;  
+            if (aToken){
+             console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + aToken + " refreshToken :" + rToken); 
+            GA.getGA(aToken, rToken, uEmail);            
+            }
           }
-          if (aToken){
-            console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + aToken + " refreshToken :" + rToken); 
-            GA.getGA(aToken, rToken, uEmail);
           }
       }
     }
