@@ -24,11 +24,11 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
-//refreshOauth2Token('ya29.CjCPA1s8jjG4w6k4E0PCdDdy1wgg-9R2s2tTcS1lHBVD7j8wnU-0XBBzU1nONbkMaFA',
-//    '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN');
+refreshOauth2Token('ya29.CjCPA1s8jjG4w6k4E0PCdDdy1wgg-9R2s2tTcS1lHBVD7j8wnU-0XBBzU1nONbkMaFA',
+    '');
 
 // call sequential GA test
-loadGASeqTest();
+//loadGASeqTest();
 
 
 
