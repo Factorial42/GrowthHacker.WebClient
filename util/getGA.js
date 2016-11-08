@@ -25,7 +25,7 @@ function getGA(accessToken, refreshToken, userEmail) {
         console.log("GetGA Request Params::GA Tokens:" + accessToken + " : " + refreshToken + "Tetherer Email:" + userEmail);
 
         //set/read token from DB/session clean up later
-	var oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
+        var oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
         oauth2Client.credentials = {
             //access_token: 'ya29.Ci9_Aws_eMxjJ_xM5zkrNlxnkPfNjr8QxKcY8diziZNRTEi5mj2JXh0gXthhhmRNHg',
             access_token: accessToken,
@@ -74,7 +74,7 @@ function handleAccounts(oauth2Client, response, userEmail) {
                 brand.account_refresh_oauthtoken = gaRefreshToken;
 
                 //   for each account query for properties
-                queryProperties(oauth2Client,response.items[p].id, brand);
+                queryProperties(oauth2Client, response.items[p].id, brand);
             }
         }
         console.log("*******************ACCOUNTS******************");
@@ -89,7 +89,7 @@ function queryProperties(oauth2Client, accountId, brand) {
 
     try {
         //console.log("Getting properties for accountId:"+accountId+ " with auth:"+JSON.stringify(oauth2Client));
-	var webpropertiesResponse = webpropertiesList({
+        var webpropertiesResponse = webpropertiesList({
             'accountId': accountId,
             'quotaUser': accountId,
             'auth': oauth2Client
@@ -122,9 +122,13 @@ function handleProperties(oauth2Client, response, brand) {
                 brand = queryProfiles(oauth2Client, response.items[p].accountId, response.items[p].id, brand);
             }
         }
-	
-            //finally save the brand
-        if (!doesBrandAccountExist(brand.account_id)) {
+
+        // check if the brand is duplicate 
+        doesBrandAccountExist(brand.account_id, function(isDupe) {
+            console.log("doesBrandAccountExist evaluated to: " + isDupe);
+
+        //finally save the brand if not a dupe
+        if (!isDupe) {
             brand.save(function(err) {
                 if (err) console.log('Error saving brand' + err);
                 else {
@@ -136,12 +140,12 @@ function handleProperties(oauth2Client, response, brand) {
 
                     //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
                     ES.index('brands', 'brand', esBrand);
-		    //console.log("Indexing brand:"+ JSON.stringify(esBrand));
+                    //console.log("Indexing brand:"+ JSON.stringify(esBrand));
 
                     //start off the get GA process for the brand
                     esBrand._id = brand.account_id; //set the id back for API service call
-			
-		    console.log("Calling API: "+JSON.stringify(esBrand));
+
+                    console.log("Calling API: " + JSON.stringify(esBrand));
 
                     API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=1095DaysAgo&endDate=today', esBrand, function(response) {
                         console.log("Response from syncAPIPost is:" + JSON.stringify(response));
@@ -173,6 +177,7 @@ function handleProperties(oauth2Client, response, brand) {
                 }
             });
         }
+        });
         console.log("*******************PROPERTIES******************");
 
         // Get the first Google Analytics account
@@ -203,9 +208,8 @@ function queryProfiles(oauth2Client, accountId, propertyId, brand) {
         });
         if (profilesListResponse != 'undefined' && profilesListResponse.items && profilesListResponse.items.length) {
             brand = handleProfiles(profilesListResponse, brand, propertyId);
-	    return brand;
-	}
-        else
+            return brand;
+        } else
             console.log("Google API queryProfiles returned empty results");
     } catch (err) {
         console.log(err);
@@ -224,7 +228,7 @@ function handleProfiles(response, brand, propertyId) {
 
                 //Construct a view and push into Brand object
                 brand.views.push({
-		    view_native_id: propertyId, 
+                    view_native_id: propertyId,
                     view_id: response.items[p].id,
                     view_name: response.items[p].name,
                     view_tethered_user_email: response.username,
@@ -236,7 +240,7 @@ function handleProfiles(response, brand, propertyId) {
                 });
             }
         }
-	return brand;
+        return brand;
         console.log("*******************PROFILES******************");
 
 
@@ -268,19 +272,24 @@ function queryCoreReportingApi(profileId) {
     });
 }
 
-function doesBrandAccountExist(brandId) {
+function doesBrandAccountExist(brandId, callback) {
     //console.log("doesBrandAccountExist in getGA.js:: " + brandId);
-    var status = false;
     Brand.find((err, brands) => {
-        if (err) console.log(err);
+        if (err) {
+            console.log(err);
+            callback(err);
+        }
         for (var i = 0; i < brands.length; i++) {
-            if (brands[i].account_id == brandId) {
-                console.log("doesBrandAccountExist loop:: " + brands[i].account_id + " <=>" + brandId);
-                status = true;
+            //console.log("doesBrandAccountExist checking if:: " + brands[i].account_id + " == " + brandId);
+            if (brands[i].account_id.toString() == brandId) {
+                console.log("Duplicate brand found with id: " + brandId);
+                return callback(true);
             }
         }
+        console.log("Not a duplicate Brand!");
+        return callback(false);
     });
-    return status;
 }
+
 
 module.exports.getGA = getGA;
