@@ -35,9 +35,13 @@ exports.getBrands = (req, res) => {
  * GET /loadga
  * Load a test case for all brands attached to info.
  */
-exports.loadGA = (req, res) => {
+exports.getloadGA = (req, res) => {
     Brand.find((err, docs) => {
-    loadGATest.getGATest();        
+    // Iterate through all accounts that have google analytics accounts
+    // and call load GA
+    loadGATest.getGATest();  
+
+    //After done, just respond with a render to load brands page      
         res.render('brands', {
             brands: docs
         });

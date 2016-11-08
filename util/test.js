@@ -24,11 +24,11 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
-refreshOauth2Token('ya29.CjCKAwEHnvCj5dijpHsPacWPmBz50jhUm99j4lUcnNtXE65WmIpd1r5jMfVwL3MJdBQ',
-    '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN');
+//refreshOauth2Token('ya29.CjCPA1s8jjG4w6k4E0PCdDdy1wgg-9R2s2tTcS1lHBVD7j8wnU-0XBBzU1nONbkMaFA',
+//    '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN');
 
 // call sequential GA test
-//loadGASeqTest();
+loadGASeqTest();
 
 
 
@@ -53,8 +53,8 @@ function refreshOauth2Token(accessToken, refreshToken) {
 }
 
 function loadGASeqTest() {
-    GA.getGA('ya29.CjCKAxRtUw0YZqztp1XoljDZjn_uF-NVO4cqxqO2G0nc88j3Jed8ROaZpIVW-yUBmcA',
-        '1/uGpTJbcDV4hk7KIOMInjURZkmGhQ5yD7JazHXygiyzZ-nTqV6v_-v7lNkYqpJEPN', 'info@hawkemedia.com');
+    GA.getGA('ya29.CjCPA80PbLr7xGZtkPLoDeUp3Pjhsa7Whxc4KjTWfmIBxzZKHiDpEX312y0UQov7Ow4',
+        '', 'erik@hawkemedia.com');
 }
 
 function esTest() {

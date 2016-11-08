@@ -1,5 +1,8 @@
 var request = require('request');
 var async = require('async');
+var deasync = require('deasync');
+
+var syncRequest = deasync(request.post);
 
 function ping(url,callback){
     request(url, function(error, response, body) {
@@ -22,8 +25,7 @@ function syncAPIGet(url,callback) {
 //Sample POST
 function syncAPIPost(url, Object,callback) {
     //console.log ("URL:" + url);
-    console.log("syncAPIPost :: Object:" + JSON.stringify(Object));
- 
+    //console.log("syncAPIPost :: Object:" + JSON.stringify(Object));
     request.post({
         url:url, 
         json: Object},
