@@ -15,10 +15,17 @@ function ping(url,callback){
 //Sample GET
 function syncAPIGet(url,callback) {
     request(url, function(error, response, body) {
+        //console.log("syncAPIGet:" + body);
+        //console.log("syncAPIGet:" + response);
+        //console.log("syncAPIGet:" + response.statusCode);
+
+        if (error) response.log("syncAPIGet: error " + error);
         if (!error && response.statusCode == 200) {
-            //console.log(body)
             return callback(body);
-        } else console.log(error);
+        } else {
+            console.log("syncAPIGet - Error:" + error);
+            return callback(body);
+        }
     });
 }
 

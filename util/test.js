@@ -1,5 +1,7 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
+var request = require('request');
+
 const Brand = require('../models/Brand.js');
 const ES = require('../util/es.js');
 const GA = require('../util/getGA.js');
@@ -24,8 +26,12 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
-refreshOauth2Token('ya29.CjCPA4-ecxwfALXA6EAZHVUVsSkIKnF0JvgkY9b99rmsP5OpDsATSBszNAVxVASTlyM',
-    '');
+refreshOauth2Token('ya29.Ci-RAxo7z1_x3P5JsA1EAGMTlt8Etelm8iDON3wikZLYtXYqSx2m-yh28smRcjaDhA',
+    '1/9588G4PrqcAGOwbk-6EbdMncv9cbMxMD9K7iX4aOTMI',
+    function(response) {
+
+        console.log(" Returned token set is:" + JSON.stringify(response));
+    });
 
 // call sequential GA test
 //loadGASeqTest();
@@ -35,20 +41,34 @@ refreshOauth2Token('ya29.CjCPA4-ecxwfALXA6EAZHVUVsSkIKnF0JvgkY9b99rmsP5OpDsATSBs
 
 //util test functions
 
-function refreshOauth2Token(accessToken, refreshToken) {
-    const oauth2Client = new OAuth2('686502966146-42artrbsiu82metst7r9n317p2bueq1n.apps.googleusercontent.com',
+function refreshOauth2Token(accessToken, refreshToken, callback) {
+    var oauth2Client = new OAuth2('686502966146-42artrbsiu82metst7r9n317p2bueq1n.apps.googleusercontent.com',
         'GNUm2ai-CwlE4drmx8UoW0mI', 'http://localhost/auth/google/callback');
     oauth2Client.credentials = {
-        //access_token: 'ya29.Ci9_Aws_eMxjJ_xM5zkrNlxnkPfNjr8QxKcY8diziZNRTEi5mj2JXh0gXthhhmRNHg',
         access_token: accessToken,
         refresh_token: refreshToken,
     };
-    //console.log(oauth2Client);
-    oauth2Client.refreshAccessToken(function(err, tokens) {
-        // your access_token is now refreshed and stored in oauth2Client
-        // store these new tokens in a safe place (e.g. database)
-        console.log ( err );
-        console.log("Refreshed token is :" + oauth2Client);
+
+    console.log("Old token set:" + JSON.stringify(oauth2Client));
+
+    // check if token is valid
+    tokenCheckURL = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken;
+    request(tokenCheckURL, function(error, response, body) {
+        if (error || response.statusCode != '200') {
+            //case of refresh the token
+            console.log("Token is being refreshed..");
+
+            oauth2Client.refreshAccessToken(function(err, tokens) {
+                // your access_token is now refreshed and stored in oauth2Client
+                // store these new tokens in a safe place (e.g. database)
+                if (err) console.log(err);
+                console.log("New token set:" + JSON.stringify(oauth2Client));
+                callback(oauth2Client);
+            });
+        } else {
+            console.log("returning old & valid token");
+            callback(oauth2Client);
+        }
 
     });
 }

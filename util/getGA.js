@@ -1,5 +1,7 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
+var request = require('request');
+
 var deasync = require('deasync');
 
 const API = require('../util/APIFacade.js');
@@ -32,20 +34,26 @@ function getGA(accessToken, refreshToken, userEmail) {
             refresh_token: refreshToken,
         };
         console.log(oauth2Client);
-        try {
-            var accountListsResponse = accountsList({
-                'auth': oauth2Client,
-                'quotaUser': userEmail
-            });
+        //try refreshing the tokens(in case they are expired or invalid or revoked)
 
-            if (accountListsResponse != 'undefined' && accountListsResponse.items && accountListsResponse.items.length)
-                handleAccounts(oauth2Client, accountListsResponse, userEmail);
-            else
-                console.log("Google Management API returned 0 Accounts");
-        } catch (err) {
-            console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
-            console.log(err);
-        }
+        refreshOauth2Token(accessToken, refreshToken, function(responseTokenSet) {
+            oauth2Client = responseTokenSet;
+
+            try {
+                var accountListsResponse = accountsList({
+                    'auth': oauth2Client,
+                    'quotaUser': userEmail
+                });
+
+                if (accountListsResponse != 'undefined' && accountListsResponse.items && accountListsResponse.items.length)
+                    handleAccounts(oauth2Client, accountListsResponse, userEmail);
+                else
+                    console.log("Google Management API returned 0 Accounts");
+            } catch (err) {
+                console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
+                console.log(err);
+            }
+        });
 
     }
 }
@@ -127,56 +135,56 @@ function handleProperties(oauth2Client, response, brand) {
         doesBrandAccountExist(brand.account_id, function(isDupe) {
             console.log("doesBrandAccountExist evaluated to: " + isDupe);
 
-        //finally save the brand if not a dupe
-        if (!isDupe) {
-            brand.save(function(err) {
-                if (err) console.log('Error saving brand' + err);
-                else {
-                    //console.log ("Brand before:" + JSON.stringify(brand));
-                    var esBrand = brand.toObject();
-                    delete esBrand["_id"];
-                    //esBrand._id = brand.account_id;
-                    //console.log ("Brand after:" + JSON.stringify(esBrand)); 
+            //finally save the brand if not a dupe
+            if (!isDupe) {
+                brand.save(function(err) {
+                    if (err) console.log('Error saving brand' + err);
+                    else {
+                        //console.log ("Brand before:" + JSON.stringify(brand));
+                        var esBrand = brand.toObject();
+                        delete esBrand["_id"];
+                        //esBrand._id = brand.account_id;
+                        //console.log ("Brand after:" + JSON.stringify(esBrand)); 
 
-                    //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
-                    ES.index('brands', 'brand', esBrand);
-                    //console.log("Indexing brand:"+ JSON.stringify(esBrand));
+                        //index  brand into elastic    -- TODO: Add a function/callback model for exception path                    
+                        ES.index('brands', 'brand', esBrand);
+                        //console.log("Indexing brand:"+ JSON.stringify(esBrand));
 
-                    //start off the get GA process for the brand
-                    esBrand._id = brand.account_id; //set the id back for API service call
+                        //start off the get GA process for the brand
+                        esBrand._id = brand.account_id; //set the id back for API service call
 
-                    console.log("Calling API: " + JSON.stringify(esBrand));
+                        console.log("Calling API: " + JSON.stringify(esBrand));
 
-                    API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
-                        console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
+                            console.log("Response from syncAPIPost is:" + JSON.stringify(response));
 
-                        //update the brand with GA count info
+                            //update the brand with GA count info
 
-                        if (response != 'undefined' && response.account_id) {
-                            Brand.findOne({
-                                account_id: response.account_id
-                            }, function(err, doc) {
-                                if (!err) {
-                                    //set update values here & save the doc
-                                    doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
-                                    doc.account_oauthtoken = response.account_oauthtoken;
-                                    doc.account_ingest_status = response.account_record_lastrefresh_status;
-                                    doc.account_record_lastrefresh = response.account_record_lastrefresh;
-                                    doc.account_record_total += response.account_record_lastrefresh;
-                                    //doc.account_tether_refresh_datetime = Date.now;
-                                    doc.save((err) => {
-                                        if (err) {
-                                            console.log(err);
-                                            return next(err);
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
+                            if (response != 'undefined' && response.account_id) {
+                                Brand.findOne({
+                                    account_id: response.account_id
+                                }, function(err, doc) {
+                                    if (!err) {
+                                        //set update values here & save the doc
+                                        doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
+                                        doc.account_oauthtoken = response.account_oauthtoken;
+                                        doc.account_ingest_status = response.account_record_lastrefresh_status;
+                                        doc.account_record_lastrefresh = response.account_record_lastrefresh;
+                                        doc.account_record_total += response.account_record_lastrefresh;
+                                        //doc.account_tether_refresh_datetime = Date.now;
+                                        doc.save((err) => {
+                                            if (err) {
+                                                console.log(err);
+                                                return next(err);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
         });
         console.log("*******************PROPERTIES******************");
 
@@ -269,6 +277,39 @@ function queryCoreReportingApi(profileId) {
         console.log(error);
         var formattedJson = JSON.stringify(response.result, null, 2);
         console.log(formattedJson);
+    });
+}
+
+
+function refreshOauth2Token(accessToken, refreshToken, callback) {
+    var oauth2Client = new OAuth2('686502966146-42artrbsiu82metst7r9n317p2bueq1n.apps.googleusercontent.com',
+        'GNUm2ai-CwlE4drmx8UoW0mI', 'http://localhost/auth/google/callback');
+    oauth2Client.credentials = {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+    };
+
+    console.log("Old token set:" + JSON.stringify(oauth2Client));
+
+    // check if token is valid
+    tokenCheckURL = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken;
+    request(tokenCheckURL, function(error, response, body) {
+        if (error || response.statusCode != '200') {
+            //case of refresh the token
+            console.log("Token is being refreshed..");
+
+            oauth2Client.refreshAccessToken(function(err, tokens) {
+                // your access_token is now refreshed and stored in oauth2Client
+                // store these new tokens in a safe place (e.g. database)
+                if (err) console.log(err);
+                console.log("New token set:" + JSON.stringify(oauth2Client));
+                callback(oauth2Client);
+            });
+        } else {
+            console.log("returning old & valid token");
+            callback(oauth2Client);
+        }
+
     });
 }
 
