@@ -1,7 +1,6 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
 var request = require('request');
-
 var deasync = require('deasync');
 
 const API = require('../util/APIFacade.js');
@@ -35,9 +34,8 @@ function getGA(accessToken, refreshToken, userEmail) {
         };
         //console.log(oauth2Client);
         //try refreshing the tokens(in case they are expired or invalid or revoked)
-
-        refreshOauth2Token(accessToken, refreshToken, function(responseTokenSet) {
-            oauth2Client = responseTokenSet;
+        //refreshOauth2Token(accessToken, refreshToken, function(responseTokenSet) {
+        //    oauth2Client = responseTokenSet;
 
             try {
                 var accountListsResponse = accountsList({
@@ -53,7 +51,7 @@ function getGA(accessToken, refreshToken, userEmail) {
                 console.log("The Access Token resulted in Error, could be insufficient permissions or No Google Accounts associated with grants");
                 console.log(err);
             }
-        });
+       // });
 
     }
 }
@@ -334,3 +332,4 @@ function doesBrandAccountExist(brandId, callback) {
 
 
 module.exports.getGA = getGA;
+module.exports.refreshOauth2Token = refreshOauth2Token;

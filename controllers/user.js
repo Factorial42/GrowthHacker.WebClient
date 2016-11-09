@@ -395,8 +395,12 @@ exports.getloadGA = (req, res) => {
                         if (docs[i].tokens[j + 1].kind.toString() == 'google#analytics#refresh_token')
                             var rToken = docs[i].tokens[j + 1].refreshToken;
                         if (aToken && rToken) {
-                            console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + aToken + " refreshToken :" + rToken);
-                            GA.getGA(aToken, rToken, uEmail);
+                            //get refreshed tokens
+                            GA.refreshOauth2Token(aToken, rToken, function(responseTokenSet) {
+                                var oauth2Client = responseTokenSet;
+                                //console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + oauth2Client.credentials.access_token + " refreshToken :" + oauth2Client.credentials.refresh_token);
+                                GA.getGA(oauth2Client.credentials.access_token, oauth2Client.credentials.refresh_token, uEmail);
+                            });
                         } else {
                             console.log("Error fetching access & Refresh Token...!");
                         }
