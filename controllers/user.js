@@ -4,8 +4,6 @@ const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
 const GA = require('../util/getGA');
-var deasync = require('deasync');
-var getGA = deasync(GA.getGA);
 
 /**
  * GET /login
@@ -398,7 +396,7 @@ exports.getloadGA = (req, res) => {
                             var rToken = docs[i].tokens[j + 1].refreshToken;
                         if (aToken && rToken) {
                             console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + aToken + " refreshToken :" + rToken);
-                            getGA(aToken, rToken, uEmail);
+                            GA.getGA(aToken, rToken, uEmail);
                         } else {
                             console.log("Error fetching access & Refresh Token...!");
                         }

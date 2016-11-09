@@ -33,7 +33,7 @@ function getGA(accessToken, refreshToken, userEmail) {
             access_token: accessToken,
             refresh_token: refreshToken,
         };
-        console.log(oauth2Client);
+        //console.log(oauth2Client);
         //try refreshing the tokens(in case they are expired or invalid or revoked)
 
         refreshOauth2Token(accessToken, refreshToken, function(responseTokenSet) {
