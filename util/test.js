@@ -26,11 +26,11 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
-refreshOauth2Token('ya29.Ci-RAxo7z1_x3P5JsA1EAGMTlt8Etelm8iDON3wikZLYtXYqSx2m-yh28smRcjaDhA',
-    '1/9588G4PrqcAGOwbk-6EbdMncv9cbMxMD9K7iX4aOTMI',
+refreshOauth2Token('ya29.Ci-SA0TlOyYMQ93wYs_5KBXDxA_3ls-iFfxVzRgmgx1nw3ry6gdzOr-wP_3VtQOvtw',
+    '1/tHjMn6jlRz1mVoD36GvUsAr-rbmxRU5wg_GxjlYgTwg',
     function(response) {
-
         console.log(" Returned token set is:" + JSON.stringify(response));
+        //queryCoreReportingApi('99659237', response);
     });
 
 // call sequential GA test
@@ -118,3 +118,20 @@ Brand.findOne({
     }
 });
 */
+
+function queryCoreReportingApi(profileId,oauth2Client) {
+    console.log("Querying GA for profileID:" + profileId);
+    // Query the Core Reporting API for the number sessions for
+    // the past seven days.
+    analytics.data.ga.get({
+        'auth': oauth2Client,
+        'ids': 'ga:' + profileId,
+        'start-date': '7daysAgo',
+        'end-date': 'today',
+        'metrics': 'ga:sessions'
+    }, function(error, response) {
+        console.log(error);
+        var formattedJson = JSON.stringify(response.result, null, 2);
+        console.log(formattedJson);
+    });
+}

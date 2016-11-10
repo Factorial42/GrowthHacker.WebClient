@@ -1,9 +1,13 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
+var deasync = require('deasync');
 
 const API = require('../util/APIFacade.js');
 const GA = require('../util/getGA.js');
 const Brand = require('../models/Brand.js');
+
+
+var getAPI = deasync(API.syncAPIPost);
 
 exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
@@ -46,7 +50,7 @@ exports.getLoadGA = (req, res) => {
 
             console.log("Calling API: " + JSON.stringify(esBrand));
 
-            API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
+            var response = getAPI(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand);
                 console.log("Response from syncAPIPost is:" + JSON.stringify(response));
 
                 //update the brand with GA count info
@@ -71,8 +75,6 @@ exports.getLoadGA = (req, res) => {
                         }
                     });
                 }
-            });
-
         }
 
         res.render('brands', {
