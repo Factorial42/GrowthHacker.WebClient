@@ -48,10 +48,10 @@ exports.getLoadGA = (req, res) => {
             //console.log("Brand after:" + JSON.stringify(esBrand));
             esBrand._id = brands[i].account_id; //set the id back for API service call
 
-            console.log("Calling API: " + JSON.stringify(esBrand));
+            console.log("Calling API: " + JSON.stringify(esBrand, null, 2));
 
             var response = getAPI(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand);
-                console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+                console.log("Response from syncAPIPost is:" + JSON.stringify(response, null, 2));
 
                 //update the brand with GA count info
                 if (response != 'undefined' && response.account_id) {

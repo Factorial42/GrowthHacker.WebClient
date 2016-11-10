@@ -49,7 +49,7 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
         refresh_token: refreshToken,
     };
 
-    console.log("Old token set:" + JSON.stringify(oauth2Client));
+    console.log("Old token set:" + JSON.stringify(oauth2Client, null, 2));
 
     // check if token is valid
     tokenCheckURL = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken;
@@ -62,7 +62,7 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
                 // your access_token is now refreshed and stored in oauth2Client
                 // store these new tokens in a safe place (e.g. database)
                 if (err) console.log(err);
-                console.log("New token set:" + JSON.stringify(oauth2Client));
+                console.log("New token set:" + JSON.stringify(oauth2Client, null, 2));
                 callback(oauth2Client);
             });
         } else {
