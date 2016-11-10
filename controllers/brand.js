@@ -1,5 +1,6 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
+
 const API = require('../util/APIFacade.js');
 const GA = require('../util/getGA.js');
 const Brand = require('../models/Brand.js');
@@ -40,7 +41,7 @@ exports.getLoadGA = (req, res) => {
         for (var i = 0; i < brands.length; i++) {
             var esBrand = brands[i].toObject();
             delete esBrand["_id"];
-            console.log("Brand after:" + JSON.stringify(esBrand));
+            //console.log("Brand after:" + JSON.stringify(esBrand));
             esBrand._id = brands[i].account_id; //set the id back for API service call
 
             console.log("Calling API: " + JSON.stringify(esBrand));

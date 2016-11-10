@@ -40,7 +40,8 @@ function syncAPIPost(url, Object,callback) {
         if (!error && (response.statusCode == 200 || response.statusCode == 201)) {
             console.log(body);
             return callback(body);
-        }else console.log('Somethin Wong! :: ' + error);
+        }
+        if (error) console.log('Somethin Wong! :: ' + body + ":" + error);
     }
 );
 }

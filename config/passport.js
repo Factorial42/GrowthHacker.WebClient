@@ -248,6 +248,9 @@ passport.use(new GoogleStrategy({
       if (existingUser) {
         req.flash('errors', { msg: 'There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.' });
         done(err);
+      }else if (refreshToken == 'undefined' || refreshToken == null){
+        req.flash('errors', { msg: 'Faile to aquire refresh token. Visit https://security.google.com/settings/security/permissions and revoke permissions before re-tethering again!' });
+        done(err);       
       } else {
         User.findById(req.user.id, (err, user) => {
           if (err) { return done(err); }
