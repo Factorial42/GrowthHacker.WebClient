@@ -378,7 +378,7 @@ exports.getForgot = (req, res) => {
  * GET /loadga
  * Load a test case for all brands attached to info.
  */
-exports.getloadGA = (req, res) => {
+exports.getloadBrandsAndGA = (req, res) => {
     User.find((err, docs) => {
         // Iterate through all accounts that have google analytics accounts
         // and call load GA

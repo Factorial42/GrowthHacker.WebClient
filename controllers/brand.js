@@ -1,6 +1,6 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
-
+const API = require('../util/APIFacade.js');
 const GA = require('../util/getGA.js');
 const Brand = require('../models/Brand.js');
 
@@ -30,14 +30,63 @@ exports.getBrands = (req, res) => {
     });
 };
 
+/**
+ * GET /loadGA
+ * Load Brands for all Brands.
+ */
+exports.getLoadGA = (req, res) => {
+    Brand.find((err, brands) => {
+        //for each brand call the GA API
+        for (var i = 0; i < brands.length; i++) {
+            var esBrand = brands[i].toObject();
+            delete esBrand["_id"];
+            console.log("Brand after:" + JSON.stringify(esBrand));
+            esBrand._id = brands[i].account_id; //set the id back for API service call
+
+            console.log("Calling API: " + JSON.stringify(esBrand));
+
+            API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
+                console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+
+                //update the brand with GA count info
+                if (response != 'undefined' && response.account_id) {
+                    Brand.findOne({
+                        account_id: response.account_id
+                    }, function(err, doc) {
+                        if (!err) {
+                            //set update values here & save the doc
+                            doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
+                            doc.account_oauthtoken = response.account_oauthtoken;
+                            doc.account_ingest_status = response.account_record_lastrefresh_status;
+                            doc.account_record_lastrefresh = response.account_record_lastrefresh;
+                            doc.account_record_total += response.account_record_lastrefresh;
+                            //doc.account_tether_refresh_datetime = Date.now;
+                            doc.save((err) => {
+                                if (err) {
+                                    console.log(err);
+                                    return next(err);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+        }
+
+        res.render('brands', {
+            brands: brands
+        });
+    });
+};
 
 /**
  * GET /brands
  * List all Views/Accounts etc.
  */
 exports.getAnalytics = (req, res) => {
-     var brandId = req.params.brandId;
-     Brand.findOne({
+    var brandId = req.params.brandId;
+    Brand.findOne({
         account_id: brandId
     }, function(err, doc) {
         res.render('analytics', {
