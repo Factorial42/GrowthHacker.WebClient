@@ -26,15 +26,40 @@ mongoose.connection.on('error', () => {
 //Call stack
 
 //run first to refresh token
+/*
 refreshOauth2Token('ya29.Ci-SA0TlOyYMQ93wYs_5KBXDxA_3ls-iFfxVzRgmgx1nw3ry6gdzOr-wP_3VtQOvtw',
     '1/tHjMn6jlRz1mVoD36GvUsAr-rbmxRU5wg_GxjlYgTwg',
     function(response) {
         console.log(" Returned token set is:" + JSON.stringify(response));
         //queryCoreReportingApi('99659237', response);
     });
+*/
+
 
 // call sequential GA test
 //loadGASeqTest();
+
+//Test SQS messaging & sample POST
+
+Brand.findOne({
+    account_id: '61002524'
+}, function(err, doc) {
+    if (!err) {
+        var _doc = doc.toObject();
+        delete _doc._id;
+        _doc._id = doc.account_id;
+
+        console.log("Posting to API POST :" + JSON.stringify( _doc, null, 2));
+        //API.sendSQSMessage ( _doc, function(response){
+        //    console.log ("Response from sendSQSMessage: " + JSON.stringify( response, null, 2));
+        //});
+        //API.syncAPIPost('http://localhost:8080/googleAnalytics/ingestData?startDate=1DaysAgo&endDate=today', _doc, function(response) {
+        //    console.log("Response from syncAPIPost is:" + response);
+        //});
+    } else {
+        throw err;
+    }
+});
 
 
 
@@ -96,30 +121,7 @@ API.syncAPIGet('http://growthhacker.f42labs.com:9200/', function(response) {
 */
 
 
-//Sample POST Test
-/*
-Brand.findOne({
-    account_id: '61002524'
-}, function(err, doc) {
-    if (!err) {
-        //console.log(doc);
-        var _doc = doc.toObject();
-        delete _doc._id;
-        _doc._id = doc.account_id;
-        //console.log("AFTER ID manipulation:" + JSON.stringify(_doc)); 
-
-
-        //console.log("Brand for ingest: " + doc);
-        API.syncAPIPost('http://localhost:8080/googleAnalytics/ingestData?startDate=1DaysAgo&endDate=today', _doc, function(response) {
-            console.log("Response from syncAPIPost is:" + response);
-        });
-    } else {
-        throw err;
-    }
-});
-*/
-
-function queryCoreReportingApi(profileId,oauth2Client) {
+function queryCoreReportingApi(profileId, oauth2Client) {
     console.log("Querying GA for profileID:" + profileId);
     // Query the Core Reporting API for the number sessions for
     // the past seven days.

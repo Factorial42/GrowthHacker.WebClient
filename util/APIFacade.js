@@ -1,10 +1,43 @@
 var request = require('request');
 var async = require('async');
 var deasync = require('deasync');
+var AWS = require('aws-sdk');
 
 var syncRequest = deasync(request.post);
 
-function ping(url,callback){
+
+
+
+function sendSQSMessage(_payload, callback) {
+    AWS.config.update({
+        accessKeyId: process.env.SQS_ACCESSKEY_ID,
+        secretAccessKey: process.env.SQS_SECRETKEY
+    });
+    var sqs = new AWS.SQS({
+        region: 'us-west-2'
+    });
+    var msg = {
+        payload: _payload
+    };
+
+    var sqsParams = {
+        MessageBody: JSON.stringify(msg),
+        QueueUrl: process.env.SQS_QUEUE_URL
+    };
+
+    sqs.sendMessage(sqsParams, function(err, data) {
+        if (err) {
+            console.log('ERR', err);
+            return callback(err);
+        }
+
+        //console.log(data);
+        return callback(data);
+    });
+}
+
+
+function ping(url, callback) {
     request(url, function(error, response, body) {
         if (!error)
             return callback(response.statusCode);
@@ -13,7 +46,7 @@ function ping(url,callback){
 }
 
 //Sample GET
-function syncAPIGet(url,callback) {
+function syncAPIGet(url, callback) {
     request(url, function(error, response, body) {
         //console.log("syncAPIGet:" + body);
         //console.log("syncAPIGet:" + response);
@@ -30,20 +63,21 @@ function syncAPIGet(url,callback) {
 }
 
 //Sample POST
-function syncAPIPost(url, Object,callback) {
+function syncAPIPost(url, Object, callback) {
     //console.log ("URL:" + url);
     //console.log("syncAPIPost :: Object:" + JSON.stringify(Object));
     request.post({
-        url:url, 
-        json: Object},
-    function (error, response, body) {
-        if (!error && (response.statusCode == 200 || response.statusCode == 201)) {
-            console.log(body);
-            return callback(body);
+            url: url,
+            json: Object
+        },
+        function(error, response, body) {
+            if (!error && (response.statusCode == 200 || response.statusCode == 201)) {
+                console.log(body);
+                return callback(body);
+            }
+            if (error) console.log('Somethin Wong! :: ' + body + ":" + error);
         }
-        if (error) console.log('Somethin Wong! :: ' + body + ":" + error);
-    }
-);
+    );
 }
 
 
@@ -114,3 +148,4 @@ module.exports.ping = ping;
 module.exports.asyncAPICall = asyncAPICall;
 module.exports.syncAPIGet = syncAPIGet;
 module.exports.syncAPIPost = syncAPIPost;
+module.exports.sendSQSMessage = sendSQSMessage;

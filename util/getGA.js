@@ -153,11 +153,17 @@ function handleProperties(oauth2Client, response, brand) {
 
                         console.log("Calling API: " + JSON.stringify(esBrand));
 
-                        API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
-                            console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+                        //Call java API to start ingesting GA
+                        //API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
+                        //    console.log("Response from syncAPIPost is:" + JSON.stringify(response));
+
+                        //Alternatively enqueu via SQS to start intesting GA
+                        API.sendSQSMessage ( esBrand, function(response){
+                            console.log ("Response from sendSQSMessage: " + JSON.stringify( response, null, 2));
+
 
                             //update the brand with GA count info
-
+                            /*
                             if (response != 'undefined' && response.account_id) {
                                 Brand.findOne({
                                     account_id: response.account_id
@@ -178,7 +184,7 @@ function handleProperties(oauth2Client, response, brand) {
                                         });
                                     }
                                 });
-                            }
+                            }*/
                         });
                     }
                 });
