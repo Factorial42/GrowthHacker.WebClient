@@ -40,7 +40,7 @@ refreshOauth2Token('ya29.Ci-SA0TlOyYMQ93wYs_5KBXDxA_3ls-iFfxVzRgmgx1nw3ry6gdzOr-
 //loadGASeqTest();
 
 //Test SQS messaging & sample POST
-
+/*
 Brand.findOne({
     account_id: '61002524'
 }, function(err, doc) {
@@ -60,7 +60,7 @@ Brand.findOne({
         throw err;
     }
 });
-
+*/
 
 
 
