@@ -14,14 +14,18 @@ function sendSQSMessage(_payload, callback) {
         secretAccessKey: process.env.SQS_SECRETKEY
     });
     var sqs = new AWS.SQS({
-        region: 'us-west-2'
+        region: process.env.SQS_REGION
     });
     var msg = {
-        payload: _payload,
+        brand: _payload,
         startDate: process.env.GA_BASELOAD_STARTDATE,
         endDate: process.env.GA_BASELOAD_ENDDATE,
-        MessageType: process.env.SQS_MESSAGETYPE
+        MessageAttributes: {
+        MessageType: { DataType: 'String', StringValue: process.env.SQS_MESSAGETYPE}
+        }
     };
+
+    //console.log ( "MESSAGE:" + JSON.stringify( msg, null, 2));
 
     var sqsParams = {
         MessageBody: JSON.stringify(msg),

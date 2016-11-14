@@ -9,8 +9,8 @@ AWS.config.update({
 });
 
 var app = Consumer.create({
-    queueUrl: 'https://sqs.us-west-2.amazonaws.com/837567902566/GH-GAIngestQ',
-    region: 'eu-west-2',
+    queueUrl: 'https://sqs.us-west-2.amazonaws.com/837567902566/GH-GAIngestQueue_DEV',
+    region: 'us-west-2',
     batchSize: 1,
     handleMessage: function(message, done) {
 
