@@ -19,17 +19,17 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: process.env.GA_BASELOAD_STARTDATE,
-        endDate: process.env.GA_BASELOAD_ENDDATE,
-        MessageAttributes: {
-        MessageType: { DataType: 'String', StringValue: process.env.SQS_MESSAGETYPE}
-        }
+        endDate: process.env.GA_BASELOAD_ENDDATE
     };
 
     //console.log ( "MESSAGE:" + JSON.stringify( msg, null, 2));
 
     var sqsParams = {
         MessageBody: JSON.stringify(msg),
-        QueueUrl: process.env.SQS_QUEUE_URL
+        QueueUrl: process.env.SQS_QUEUE_URL,
+        MessageAttributes: {
+        MessageType: { DataType: 'String', StringValue: process.env.SQS_MESSAGETYPE}
+        }
     };
 
     sqs.sendMessage(sqsParams, function(err, data) {
