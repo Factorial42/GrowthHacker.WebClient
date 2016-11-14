@@ -157,7 +157,7 @@ function handleProperties(oauth2Client, response, brand) {
                         //API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
                         //    console.log("Response from syncAPIPost is:" + JSON.stringify(response));
 
-                        //Alternatively enqueu via SQS to start intesting GA
+                        //Alternatively enqueu via SQS to start ingesting GA
                         API.sendSQSMessage ( esBrand, function(response){
                             console.log ("Response from sendSQSMessage: " + JSON.stringify( response, null, 2));
 

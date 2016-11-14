@@ -17,7 +17,10 @@ function sendSQSMessage(_payload, callback) {
         region: 'us-west-2'
     });
     var msg = {
-        payload: _payload
+        payload: _payload,
+        startDate: process.env.GA_BASELOAD_STARTDATE,
+        endDate: process.env.GA_BASELOAD_ENDDATE,
+        MessageType: process.env.SQS_MESSAGETYPE
     };
 
     var sqsParams = {
