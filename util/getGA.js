@@ -79,7 +79,10 @@ function handleAccounts(oauth2Client, response, userEmail) {
                 brand.account_oauthtoken = gaToken;
                 brand.account_refresh_oauthtoken = gaRefreshToken;
 
-                //   for each account query for properties
+                //set the dashboard url
+                brand.account_dashboard_url = process.env.GA_DASHBOARD_TEMPLATE.replace( /\*/, 'accountId:%22' + brand.account_id + "%22" );
+
+                //for each account query for properties
                 queryProperties(oauth2Client, response.items[p].id, brand);
             }
         }

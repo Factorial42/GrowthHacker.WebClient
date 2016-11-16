@@ -74,7 +74,6 @@ else
 /*
 * Connect to API Service
 */
-
 API.ping(process.env.API_SERVICE_ENDPOINT,function(response){
   //console.log("Response is: " + response);
   if (response)
@@ -82,6 +81,7 @@ API.ping(process.env.API_SERVICE_ENDPOINT,function(response){
   else
     console.log('%s API Service Connection error! Please make sure ' + process.env.API_SERVICE_ENDPOINT + ' is running.', chalk.red('✗'));
 });
+
 /**
  * Express configuration.
  */
