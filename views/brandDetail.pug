@@ -43,7 +43,10 @@ block content
       label.col-sm-3.control-label(for='name') Brand Tags:
       .col-sm-7
         input.form-control(type='textarea', name='account_tags', id='account_tags', value=brand.account_tags.toString())
-
+    .form-group
+      label.col-sm-3.control-label(for='name') Brand Dashboard URL:
+      .col-sm-7
+        input.form-control(type='text', name='account_dashboard_url', id='account_dashboard_url', value=brand.account_dashboard_url.toString())
     .form-group
       .col-sm-offset-3.col-sm-4
         button.btn.btn.btn-primary(type='submit')

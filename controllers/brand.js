@@ -125,6 +125,7 @@ exports.postUpdateBrand = (req, res, next) => {
         brand.account_record_total = req.body.account_record_total.valueOf();
         brand.account_tags = req.body.account_tags;
         brand.account_dashboard_types = req.body.account_dashboard_types;
+        brand.account_dashboard_url = req.body.account_dashboard_url;
         brand.save((err) => {
             if (err) {
                 console.log(err);
