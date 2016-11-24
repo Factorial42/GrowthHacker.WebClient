@@ -25,6 +25,8 @@ block content
         label.col-sm-3.control-label(for='name') #{brand.account_industry_vertical}
     .form-group
       label.col-sm-3.control-label(for='name') Last Run Ingested Records:
+      a(href='/brands/' + brand.account_id + '/ingest')
+        img(src='http://chesa.com/app/wp-content/uploads/2016/03/ingest-icon.png', width='25', height='25')
       .col-sm-7
         input.form-control(type='text', name='account_record_lastrefresh', id='account_record_lastrefresh', value=brand.account_record_lastrefresh)
     .form-group
