@@ -102,8 +102,26 @@ exports.postUpdateBrand = (req, res, next) => {
         var brand = convertES2ModelSimple(_doc.hits);
         brand.account_record_lastrefresh = req.body.account_record_lastrefresh.valueOf();
         brand.account_record_total = req.body.account_record_total.valueOf();
-        brand.account_tags = req.body.account_tags;
-        brand.account_dashboard_types = req.body.account_dashboard_types;
+        
+        var tempTags = new Array();
+        if ( req.body.account_tags ){
+            tempTags = req.body.account_tags.split(",");
+            for (var i = 0; i < tempTags.length; i++) {
+                tempTags[i] = tempTags[i].trim();
+            }
+        }
+        brand.account_tags = tempTags;
+
+         var tempDashTypes = new Array();
+        if ( req.body.account_dashboard_types ){
+            tempDashTypes = req.body.account_dashboard_types.split(",");
+            for (var i = 0; i < tempDashTypes.length; i++) {
+                tempDashTypes[i] = tempDashTypes[i].trim();
+            }
+           
+        }
+       
+        brand.account_dashboard_types = tempDashTypes;
         brand.account_dashboard_url = req.body.account_dashboard_url;
         brand.account_tetherer_email = req.body.account_tetherer_email;
 
@@ -137,7 +155,7 @@ function convertES2Model(hits, indexName) {
     var brands = [];
     for (var i = 0; i < hits.length; i++) {
         if (hits[i]._source.account_tags && hits[i]._source.account_tags.length > 2)
-            hits[i]._source.account_tags = hits[i]._source.account_tags.slice(0, 2);
+            hits[i]._source.account_tags.splice(2);
         brands.push(hits[i]._source);
         //console.log (JSON.stringify(hits[i]._source, null, 2))
     }

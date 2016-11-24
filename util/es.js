@@ -72,6 +72,32 @@ function searchByBrandId(indexName, indexType, matchValue, callback) {
     });
 }
 
+function searchAnalyticsByBrandId(indexName, indexType, matchValue, callback) {
+    client.search({
+        index: indexName,
+        type: indexType,
+        body: {
+            query: {
+                match: {
+                    "accountId": matchValue
+                }
+            },
+        }
+    }, function(error, response, status) {
+        if (error) {
+            console.log("search error: " + error)
+        } else {
+            //console.log("--- Response ---");
+            //console.log(response);
+            //console.log("--- Hits ---");
+            //response.hits.hits.forEach(function(hit) {
+            //    console.log(hit);
+            //})
+            callback(response.hits);
+        }
+    });
+}
+
 function search(indexName, indexType, matchKey, matchValue){
 client.search({  
   index: indexName,
@@ -127,3 +153,4 @@ module.exports.index = index;
 module.exports.search = search;
 module.exports.searchAll = searchAll;
 module.exports.searchByBrandId = searchByBrandId;
+module.exports.searchAnalyticsByBrandId = searchAnalyticsByBrandId;
