@@ -103,7 +103,7 @@ exports.postUpdateBrand = (req, res, next) => {
         brand.account_dashboard_url = req.body.account_dashboard_url;
         brand.account_tetherer_email = req.body.account_tetherer_email;
 
-        //console.log ("Brand being updated with values:" + JSON.stringify(brand, null, 2));
+        console.log ("Brand being updated with values:" + JSON.stringify(brand, null, 2));
 
         ES.index('brands', 'brand', brand);
 

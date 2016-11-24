@@ -61,12 +61,12 @@ function searchByBrandId(indexName, indexType, matchValue, callback) {
         if (error) {
             console.log("search error: " + error)
         } else {
-            console.log("--- Response ---");
-            console.log(response);
-            console.log("--- Hits ---");
-            response.hits.hits.forEach(function(hit) {
-                console.log(hit);
-            })
+            //console.log("--- Response ---");
+            //console.log(response);
+            //console.log("--- Hits ---");
+            //response.hits.hits.forEach(function(hit) {
+            //    console.log(hit);
+            //})
             callback(response.hits);
         }
     });
