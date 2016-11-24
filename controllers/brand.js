@@ -1,84 +1,62 @@
 var googleapis = require('googleapis');
 var analytics = googleapis.analytics('v3');
 
+const ES = require('../util/es.js');
 const API = require('../util/APIFacade.js');
 const GA = require('../util/getGA.js');
 const Brand = require('../models/Brand.js');
 
 exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
-    //console.log("Brand being edited with " + brandId);
-    Brand.findOne({
-        account_id: brandId
-    }, function(err, docs) {
-        //console.log(docs);
-        //convert array to string
+    ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
+        //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
+        var brand = convertES2ModelSimple(_doc.hits);
+        console.log(JSON.stringify(brand, null, 2));
         res.render('brandDetail', {
-            brand: docs
+            brand: brand
         });
     });
 };
 
-/**
- * GET /brands
- * List all Brands.
- */
+
+exports.getAnalytics = (req, res) => {
+    var brandId = req.params.brandId;
+    ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
+        //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
+        var brand = convertES2ModelSimple(_doc.hits);
+        console.log(JSON.stringify(brand, null, 2));
+        res.render('analytics', {
+            brand: brand
+        });
+    });
+};
+
+//elastic version to retrieve all brands
 exports.getBrands = (req, res) => {
-    Brand.find((err, docs) => {
+    ES.searchAll('brands', 'brand', function(_docs) {
+        var docs = convertES2Model(_docs.hits, "Brand");
         res.render('brands', {
             brands: docs
         });
     });
 };
 
+
 /**
  * GET /loadGA
  * Load Brands for all Brands.
  */
 exports.getLoadGA = (req, res) => {
-    Brand.find((err, brands) => {
+    ES.searchAll('brands', 'brand', function(_docs) {
+        var brands = convertES2ModelSimple(_docs.hits);
+
         //for each brand call the GA API
         for (var i = 0; i < brands.length; i++) {
-            var esBrand = brands[i].toObject();
-            delete esBrand["_id"];
-            //console.log("Brand after:" + JSON.stringify(esBrand));
-            esBrand._id = brands[i].account_id; //set the id back for API service call
-
-            console.log("Calling API: " + JSON.stringify(esBrand));
-
-            //API.syncAPIPost(process.env.API_SERVICE_ENDPOINT + '/googleAnalytics/ingestData?startDate=3650DaysAgo&endDate=today', esBrand, function(response) {
-            //    console.log("Response from syncAPIPost is:" + JSON.stringify(response));
-            
-            API.sendSQSMessage ( esBrand, function(response){
-                console.log ("Response from sendSQSMessage: " + JSON.stringify( response, null, 2));
-
-                //update the brand with GA count info
-                /*
-                if (response != 'undefined' && response.account_id) {
-                    Brand.findOne({
-                        account_id: response.account_id
-                    }, function(err, doc) {
-                        if (!err) {
-                            //set update values here & save the doc
-                            doc.account_refresh_oauthtoken = response.account_refresh_oauthtoken;
-                            doc.account_oauthtoken = response.account_oauthtoken;
-                            doc.account_ingest_status = response.account_record_lastrefresh_status;
-                            doc.account_record_lastrefresh = response.account_record_lastrefresh;
-                            doc.account_record_total += response.account_record_lastrefresh;
-                            //doc.account_tether_refresh_datetime = Date.now;
-                            doc.save((err) => {
-                                if (err) {
-                                    console.log(err);
-                                    return next(err);
-                                }
-                            });
-                        }
-                    });
-                }*/
+            console.log("Brand is:" + JSON.stringify(brands[i], null, 2));
+            API.sendSQSMessage(brands[i], function(response) {
+                //console.log ("Response from sendSQSMessage: " + JSON.stringify( response, null, 2));
             });
-
         }
-
         res.render('brands', {
             brands: brands
         });
@@ -91,11 +69,12 @@ exports.getLoadGA = (req, res) => {
  */
 exports.getAnalytics = (req, res) => {
     var brandId = req.params.brandId;
-    Brand.findOne({
-        account_id: brandId
-    }, function(err, doc) {
+    ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
+        //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
+        var brand = convertES2ModelSimple(_doc.hits);
+        console.log(JSON.stringify(brand, null, 2));
         res.render('analytics', {
-            brand: doc
+            brand: brand
         });
     });
 };
@@ -115,26 +94,48 @@ exports.postUpdateBrand = (req, res, next) => {
         return res.redirect('/login');
     }
 
-    Brand.findOne({
-        account_id: brandId
-    }, function(err, brand) {
-        if (err) {
-            return next(err);
-        }
+    ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
+        var brand = convertES2ModelSimple(_doc.hits);
         brand.account_record_lastrefresh = req.body.account_record_lastrefresh.valueOf();
         brand.account_record_total = req.body.account_record_total.valueOf();
         brand.account_tags = req.body.account_tags;
         brand.account_dashboard_types = req.body.account_dashboard_types;
         brand.account_dashboard_url = req.body.account_dashboard_url;
-        brand.save((err) => {
-            if (err) {
-                console.log(err);
-                return next(err);
-            }
-            req.flash('success', {
-                msg: 'Brand information has been updated!'
-            });
+        brand.account_tetherer_email = req.body.account_tetherer_email;
+
+        //console.log ("Brand being updated with values:" + JSON.stringify(brand, null, 2));
+
+        ES.index('brands', 'brand', brand);
+
+        req.flash('success', {
+        msg: 'Brand information has been updated!'
+        });
             res.redirect('/brands');
         });
-    });
 };
+
+function convertES2ModelSimple(hits) {
+    //console.log("convertES2Model: hitCount " + hits.length);
+    var brands = [];
+    if (hits.length == 1)
+        return hits[0]._source;
+    else {
+        for (var i = 0; i < hits.length; i++) {
+            brands.push(hits[i]._source);
+            //console.log (JSON.stringify(hits[i]._source, null, 2))
+        }
+    }
+    return brands;
+}
+
+function convertES2Model(hits, indexName) {
+    //console.log("convertES2Model: hitCount " + hits.length);
+    var brands = [];
+    for (var i = 0; i < hits.length; i++) {
+        if (hits[i]._source.account_tags && hits[i]._source.account_tags.length > 2)
+            hits[i]._source.account_tags = hits[i]._source.account_tags.slice(0, 2);
+        brands.push(hits[i]._source);
+        //console.log (JSON.stringify(hits[i]._source, null, 2))
+    }
+    return brands;
+}

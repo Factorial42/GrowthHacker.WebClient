@@ -12,11 +12,11 @@ block content
 		thead
 			th Name    
 			th Website     
-			th Dashboard
-			th Status 
-			th Tags  			
-			th Types 
-			th Records 			
+			th Dashboard      
+			th Records 	
+			th    Types 
+			th Tags
+			th Status 			
 		tr
 		tbody
 			for brand in brands
@@ -24,16 +24,15 @@ block content
 					td
 						a(href='/brands/' + brand.account_id) #{brand.account_name} 
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_website_url
-					if (brand.account_dashboard_types.length > 0 )
+					if (brand.account_dashboard_types && brand.account_dashboard_types.length > 0 )
 							td 
 								a(href='analytics/' + brand.account_id) View									
 					else
 							td Not Set 
-					
-					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_ingest_status
-					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags			
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_record_lastrefresh
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_dashboard_types			
-					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_record_lastrefresh			
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags	
+					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_ingest_status
 				tr
 			else
 				tr

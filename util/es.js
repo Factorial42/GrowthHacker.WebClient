@@ -46,6 +46,84 @@ function deleteIndex(indexName, indexType, id) {
     });
 }
 
+function searchByBrandId(indexName, indexType, matchValue, callback) {
+    client.search({
+        index: indexName,
+        type: indexType,
+        body: {
+            query: {
+                match: {
+                    "account_id": matchValue
+                }
+            },
+        }
+    }, function(error, response, status) {
+        if (error) {
+            console.log("search error: " + error)
+        } else {
+            console.log("--- Response ---");
+            console.log(response);
+            console.log("--- Hits ---");
+            response.hits.hits.forEach(function(hit) {
+                console.log(hit);
+            })
+            callback(response.hits);
+        }
+    });
+}
+
+function search(indexName, indexType, matchKey, matchValue){
+client.search({  
+  index: indexName,
+  type: indexType,
+  body: {
+    query: {
+      match: { matchKey: matchValue }
+    },
+  }
+},function (error, response,status) {
+    if (error){
+      console.log("search error: "+error)
+    }
+    else {
+      console.log("--- Response ---");
+      console.log(response);
+      console.log("--- Hits ---");
+      response.hits.hits.forEach(function(hit){
+        console.log(hit);
+      })
+    }
+});
+}
+
+function searchAll(indexName, indexType, callback) {
+    client.search({
+        index: indexName,
+        type: indexType,
+        size: 10000,
+        body: {
+            query: {
+                matchAll: {}
+            },
+        }
+    }, function(error, response, status) {
+        if (error) {
+            console.log("search error: " + error)
+        } else {
+            //console.log("--- Response ---");
+            //console.log(response);
+            //console.log("--- Hits ---");
+            response.hits.hits.forEach(function(hit) {
+                // console.log(hit);
+            })
+            callback(response.hits);
+        }
+    });
+}
+
 module.exports.deleteIndex = deleteIndex;
 module.exports.ping = ping;
 module.exports.index = index;
+module.exports.search = search;
+module.exports.searchAll = searchAll;
+module.exports.searchByBrandId = searchByBrandId;

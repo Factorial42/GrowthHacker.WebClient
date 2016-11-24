@@ -1,0 +1,15 @@
+curl -XPOST '52.37.72.190:9200/_search/template' -d '{"id":"st.analytics.stats.counts","params":{"accountId":"46828551"}}' | json_pp
+
+
+curl -XDELETE http://localhost:9200/analytics
+curl -XDELETE http://localhost:9200/brands
+
+./stream2es es --source http://52.37.72.190:9200/.kibana --target http://localhost:9200/.kibana
+
+
+https://console.aws.amazon.com/sqs/home?region=us-west-2#queue-browser:selected=https://sqs.us-west-2.amazonaws.com/837567902566/GH-GAIngestQueue_LOCAL;prefix=
+
+
+https://github.com/orgs/Factorial42/projects/1
+
+https://console.developers.google.com/apis/dashboard?project=growthhacker-145721&authuser=2&duration=PT12H
