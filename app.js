@@ -144,6 +144,7 @@ app.get('/loadGA', passportConfig.isAuthenticated,brandController.getLoadGA);
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
 app.get('/analytics/:brandId', passportConfig.isAuthenticated,brandController.getAnalytics);
 app.get('/brands/:brandId', passportConfig.isAuthenticated,brandController.getBrandByBrandId);
+app.get('/brands/:brandId/ingest', passportConfig.isAuthenticated,brandController.getBrandReingest);
 app.post('/brands/:brandId/profile', passportConfig.isAuthenticated, brandController.postUpdateBrand);
 
 

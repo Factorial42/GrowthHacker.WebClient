@@ -11,7 +11,7 @@ exports.getBrandByBrandId = (req, res) => {
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
         //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
         var brand = convertES2ModelSimple(_doc.hits);
-        console.log(JSON.stringify(brand, null, 2));
+        //console.log(JSON.stringify(brand, null, 2));
         res.render('brandDetail', {
             brand: brand
         });
@@ -24,7 +24,7 @@ exports.getAnalytics = (req, res) => {
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
         //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
         var brand = convertES2ModelSimple(_doc.hits);
-        console.log(JSON.stringify(brand, null, 2));
+        //console.log(JSON.stringify(brand, null, 2));
         res.render('analytics', {
             brand: brand
         });
@@ -63,23 +63,27 @@ exports.getLoadGA = (req, res) => {
     });
 };
 
-/**
- * GET /brands
- * List all Views/Accounts etc.
- */
-exports.getAnalytics = (req, res) => {
+
+exports.getBrandReingest = (req, res) => {
     var brandId = req.params.brandId;
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
-        //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
         var brand = convertES2ModelSimple(_doc.hits);
-        console.log(JSON.stringify(brand, null, 2));
-        res.render('analytics', {
-            brand: brand
+        console.log ( "Reingest/Enqueing Brand: " + brand.account_name);
+
+        //Enqueue the brand for ingestion
+        API.sendSQSMessage(brand, function(response) {
+            console.log("Response from sendSQSMessage: " + JSON.stringify(response, null, 2));
+
+            //console.log(JSON.stringify(brand, null, 2));
+            req.flash('success', {
+                msg: 'Brand ' + brand.account_name + ' has been scheduled for Re-ingestion!'
+            });
+            res.render('brandDetail', {
+                brand: brand
+            });
         });
     });
 };
-
-
 
 /**
  * POST /brands/:brandId/profile
@@ -103,15 +107,15 @@ exports.postUpdateBrand = (req, res, next) => {
         brand.account_dashboard_url = req.body.account_dashboard_url;
         brand.account_tetherer_email = req.body.account_tetherer_email;
 
-        console.log ("Brand being updated with values:" + JSON.stringify(brand, null, 2));
+        console.log("Brand being updated with values:" + JSON.stringify(brand, null, 2));
 
         ES.index('brands', 'brand', brand);
 
         req.flash('success', {
-        msg: 'Brand information has been updated!'
+            msg: 'Brand information has been updated!'
         });
-            res.redirect('/brands');
-        });
+        res.redirect('/brands');
+    });
 };
 
 function convertES2ModelSimple(hits) {
