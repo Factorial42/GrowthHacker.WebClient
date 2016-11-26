@@ -19,7 +19,7 @@ const brandSchema = new mongoose.Schema({
 	account_record_lastrefresh: { type: Number, default: 0 },
 	account_ingest_status: { type: String, default: 'Enqueued' }, //[Success, Failure for the base load as well as last run]
 	account_tether_refresh_datetime: Date,
-  account_dashboard_url: String,
+  account_dashboard_url: { type: String, default:''},
   account_dashboard_types: [],
   	views: [{
     view_id: String,

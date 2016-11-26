@@ -34,6 +34,7 @@ exports.getAnalytics = (req, res) => {
 //elastic version to retrieve all brands
 exports.getBrands = (req, res) => {
     ES.searchAll('brands', 'brand', function(_docs) {
+        //console.log("Brands are:" + JSON.stringify(_docs,null, 2));
         var docs = convertES2Model(_docs.hits, "Brand");
         res.render('brands', {
             brands: docs

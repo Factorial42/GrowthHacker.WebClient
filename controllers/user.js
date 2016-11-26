@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
 const GA = require('../util/getGA');
+const ES = require('../util/es.js');
 
 /**
  * GET /login
@@ -118,6 +119,7 @@ exports.postSignup = (req, res, next) => {
             if (err) {
                 return next(err);
             }
+            ES.indexUser(user);
             req.logIn(user, (err) => {
                 if (err) {
                     return next(err);
@@ -174,6 +176,7 @@ exports.postUpdateProfile = (req, res, next) => {
                 }
                 return next(err);
             }
+            ES.indexUser(user);
             req.flash('success', {
                 msg: 'Profile information has been updated.'
             });
@@ -206,6 +209,7 @@ exports.postUpdatePassword = (req, res, next) => {
             if (err) {
                 return next(err);
             }
+            ES.indexUser(user);
             req.flash('success', {
                 msg: 'Password has been changed.'
             });
@@ -249,6 +253,7 @@ exports.getOauthUnlink = (req, res, next) => {
             if (err) {
                 return next(err);
             }
+            ES.indexUser(user);
             req.flash('info', {
                 msg: `${provider} account has been unlinked.`
             });
@@ -328,6 +333,7 @@ exports.postReset = (req, res, next) => {
                         req.logIn(user, (err) => {
                             done(err, user);
                         });
+                        ES.indexUser(user);
                     });
                 });
         },
@@ -456,6 +462,7 @@ exports.postForgot = (req, res, next) => {
                 user.save((err) => {
                     done(err, token, user);
                 });
+                ES.indexUser(user);
             });
         },
         function(token, user, done) {

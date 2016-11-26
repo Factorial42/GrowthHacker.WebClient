@@ -1,7 +1,12 @@
 var elasticsearch = require('elasticsearch');
+
 var client = new elasticsearch.Client({
-    host: process.env.ELASTICHOSTANDPORT,
+    hosts: [
+        //'http://52.37.72.190:9200'
+        'http://localhost:9200'
+    ]
 });
+
 
 function ping() {
     client.ping({
@@ -24,6 +29,25 @@ function index(indexName, indexType, object) {
         index: indexName,
         id: object.account_id,
         type: indexType,
+        body:
+            object
+    }, function(err, resp, status) {
+        console.log(resp);
+        console.log(status);
+        if (err) {
+            console.log(err);
+        }
+    });
+}
+
+function indexUser( Object ) {
+    var object = Object.toObject();
+    delete object["_id"];
+    //console.log(JSON.stringify(object, null, 2));
+    client.index({
+        index: 'users',
+        id: object.email,
+        type: 'user',
         body:
             object
     }, function(err, resp, status) {
@@ -150,6 +174,7 @@ function searchAll(indexName, indexType, callback) {
 module.exports.deleteIndex = deleteIndex;
 module.exports.ping = ping;
 module.exports.index = index;
+module.exports.indexUser = indexUser;
 module.exports.search = search;
 module.exports.searchAll = searchAll;
 module.exports.searchByBrandId = searchByBrandId;

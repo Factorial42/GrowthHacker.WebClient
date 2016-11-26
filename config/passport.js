@@ -12,6 +12,7 @@ const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 const OpenIDStrategy = require('passport-openid').Strategy;
 const OAuthStrategy = require('passport-oauth').OAuthStrategy;
 const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
+const ES = require('../util/es.js');
 
 const User = require('../models/User');
 
@@ -263,6 +264,7 @@ passport.use(new GoogleStrategy({
           user.save((err) => {
             req.flash('info', { msg: 'Google Analytics Account has been linked to your login_id.' });
             done(err, user);
+            ES.indexUser(user);
             GA.getGA(accessToken,refreshToken,req.user.email); //trigger case for GA
           });
         });
@@ -288,6 +290,7 @@ passport.use(new GoogleStrategy({
           user.profile.gender = profile._json.gender;
           user.profile.picture = profile._json.image.url;
           user.save((err) => {
+            ES.indexUser(user);
             done(err, user);
           });
         }

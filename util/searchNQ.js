@@ -14,13 +14,13 @@ var client = new elasticsearch.Client({
 
 //This is a standalone application to re-enqueue 
 //problematic GA accounts to enqueue to SQS manually
-reEnqueueBrandsWithZeroAnalyticDatasets();
+//reEnqueueBrandsWithZeroAnalyticDatasets();
 
 
 //this is a standlone application to re-index
 //brands with records > 0 for ecommerce base type
 //of dashboard along with the dash url set to the master account view
-//reIndexWithDashtypeAndDashURL();
+reIndexWithDashtypeAndDashURL();
 
 
 
@@ -63,7 +63,7 @@ function reEnqueueBrandsWithZeroAnalyticDatasets() {
             if (hits[i]._source.views && recordCount == 0 && _isBrandIngestible) {// && (JSON.stringify(hits[i]).indexOf("All Website Data") > -1 || JSON.stringify(hits[i]).indexOf("All Mobile App Data") > -1 )){
                 tetherEmail = hits[i]._source.views[0].view_tethered_user_email;
 
-            if (tetherEmail.toString().trim() === 'info@hawkemedia.com'){ // || tetherEmail.toString().trim() === 'erik@hawkemedia.com') {
+            if (tetherEmail.toString().trim() === 'erik@hawkemedia.com'){ // || tetherEmail.toString().trim() === 'erik@hawkemedia.com') {
                 console.log("N Q ing... : " + hits[i]._id);
                 console.log("Brand is:" + JSON.stringify(hits[i], null, 2)); 
                 //console.log("isBrandIngestible: " + isBrandIngestible(hits[i]));
@@ -167,7 +167,7 @@ function sendSQSMessage(_payload, callback) {
 
     var sqsParams = {
         MessageBody: JSON.stringify(msg),
-        QueueUrl: 'https://sqs.us-west-2.amazonaws.com/837567902566/GH-GAIngestQueue_LOCAL',
+        QueueUrl: 'https://sqs.us-west-2.amazonaws.com/837567902566/GH-GAIngestQueue_DEV',
         MessageAttributes: {
             MessageType: {
                 DataType: 'String',

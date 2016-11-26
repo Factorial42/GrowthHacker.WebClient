@@ -66,9 +66,10 @@ mongoose.connection.on('error', () => {
 /**
 * Connect to Elastic
 */
-if (ES.ping())
+if (ES.ping()){
   console.log('%s ElasticSearch error. Please make sure ' + process.env.ELASTICHOSTANDPORT + ' is running.', chalk.red('✗'));
-else
+  process.exit();
+}else
   console.log('%s ElasticSearch connection established to ==> ' + process.env.ELASTICHOSTANDPORT + '!', chalk.green('✓'));
 
 /*
