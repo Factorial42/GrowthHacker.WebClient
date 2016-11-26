@@ -70,6 +70,32 @@ function deleteIndex(indexName, indexType, id) {
     });
 }
 
+function searchUserById(indexName, indexType, matchValue, callback) {
+    client.search({
+        index: indexName,
+        type: indexType,
+        body: {
+            query: {
+                match: {
+                    "email": matchValue
+                }
+            },
+        }
+    }, function(error, response, status) {
+        if (error) {
+            console.log("search error: " + error)
+        } else {
+            //console.log("--- Response ---");
+            //console.log(response);
+            //console.log("--- Hits ---");
+            //response.hits.hits.forEach(function(hit) {
+            //    console.log(hit);
+            //})
+            callback(response.hits);
+        }
+    });
+}
+
 function searchByBrandId(indexName, indexType, matchValue, callback) {
     client.search({
         index: indexName,
@@ -179,3 +205,4 @@ module.exports.search = search;
 module.exports.searchAll = searchAll;
 module.exports.searchByBrandId = searchByBrandId;
 module.exports.searchAnalyticsByBrandId = searchAnalyticsByBrandId;
+module.exports.searchUserById = searchUserById;

@@ -380,6 +380,64 @@ exports.getForgot = (req, res) => {
 };
 
 
+//Get Users Elastic Version
+//GET /users
+exports.getUsers = (req, res) => {
+    ES.searchAll('users', 'user', function(_docs) {
+        //console.log("Users are:" + JSON.stringify(_docs, null, 2));
+        var docs = convertES2ModelSimple(_docs.hits);
+        //console.log("Response is :" + JSON.stringify(docs, null, 2));
+        res.render('users', {
+            users: docs
+        });
+    });
+};
+
+//Get Users Elastic Version
+//GET /users/id/reload
+exports.getreloadBrandAndGA = (req, res) => {
+    var email = req.params.userId;
+    ES.searchUserById('users', 'user', email, function(_docs) {
+        var docs = convertES2ModelSimple(_docs.hits);
+        //console.log("User is :" + JSON.stringify(docs, null, 2));
+        if (docs != 'undefined' && docs.length > 0) {
+            for (var i = 0; i < docs.length; i++) {
+                var tokens = docs[i].tokens;
+                console.log("User tokens are:" + JSON.stringify(tokens));
+                for (var j = 0; j < tokens.length; j++) {
+                    //console.log('Token is:', docs[i].tokens[j].accessToken);
+                    //console.log('Kind is:', docs[i].tokens[j].kind);
+                    var uEmail = docs[i].email;
+                    if (docs[i].tokens[j].kind.toString() == 'google#analytics#access_token') {
+                        var aToken = docs[i].tokens[j].accessToken;
+                        if (docs[i].tokens[j + 1].kind.toString() == 'google#analytics#refresh_token')
+                            var rToken = docs[i].tokens[j + 1].refreshToken;
+                        if (aToken && rToken) {
+                            //get refreshed tokens
+                            GA.refreshOauth2Token(aToken, rToken, function(responseTokenSet) {
+                                var oauth2Client = responseTokenSet;
+                                //console.log("Fetching brands/accounts for: " + uEmail + " : accessToken :" + oauth2Client.credentials.access_token + " refreshToken :" + oauth2Client.credentials.refresh_token);
+                                GA.getGA(oauth2Client.credentials.access_token, oauth2Client.credentials.refresh_token, uEmail);
+                            });
+                        } else {
+                            console.log("Error fetching access & Refresh Token...!");
+                        }
+                    }
+                }
+            }
+        }
+
+
+        //flash message
+        req.flash('success', {
+            msg: 'User ' + docs[0].profile.name + ' with ID ' + docs[0].email + ' has been scheduled for Reload brands and GA!'
+        });
+        res.render('users', {
+            users: docs
+        });
+    });
+};
+
 /**
  * GET /loadga
  * Load a test case for all brands attached to info.
@@ -415,7 +473,7 @@ exports.getloadBrandsAndGA = (req, res) => {
             }
         }
         //After done, just respond with a render to load brands page      
-        res.redirect('/brands');
+        res.redirect('/users');
     });
 };
 
@@ -496,3 +554,13 @@ exports.postForgot = (req, res, next) => {
         res.redirect('/forgot');
     });
 };
+
+function convertES2ModelSimple(hits) {
+    //console.log("convertES2Model: hitCount " + hits.length);
+    var brands = [];
+    for (var i = 0; i < hits.length; i++) {
+        brands.push(hits[i]._source);
+        //console.log (JSON.stringify(hits[i]._source, null, 2))
+    }
+    return brands;
+}

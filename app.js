@@ -143,8 +143,10 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 app.get('/loadBrandsAndGA', passportConfig.isAuthenticated,userController.getloadBrandsAndGA);
 app.get('/loadGA', passportConfig.isAuthenticated,brandController.getLoadGA);
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
+app.get('/users', passportConfig.isAuthenticated,userController.getUsers);
 app.get('/analytics/:brandId', passportConfig.isAuthenticated,brandController.getAnalytics);
 app.get('/brands/:brandId', passportConfig.isAuthenticated,brandController.getBrandByBrandId);
+app.get('/users/:userId/reload', passportConfig.isAuthenticated,userController.getreloadBrandAndGA);
 app.get('/brands/:brandId/ingest', passportConfig.isAuthenticated,brandController.getBrandReingest);
 app.post('/brands/:brandId/profile', passportConfig.isAuthenticated, brandController.postUpdateBrand);
 

@@ -289,8 +289,7 @@ function queryCoreReportingApi(profileId) {
 
 
 function refreshOauth2Token(accessToken, refreshToken, callback) {
-    var oauth2Client = new OAuth2('686502966146-42artrbsiu82metst7r9n317p2bueq1n.apps.googleusercontent.com',
-        'GNUm2ai-CwlE4drmx8UoW0mI', 'http://localhost/auth/google/callback');
+    var oauth2Client = new OAuth2(process.env.GOOGLE_ID, process.env.GOOGLE_SECRET, 'http://localhost/auth/google/callback');
     oauth2Client.credentials = {
         access_token: accessToken,
         refresh_token: refreshToken,

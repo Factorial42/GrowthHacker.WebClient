@@ -140,14 +140,10 @@ exports.postUpdateBrand = (req, res, next) => {
 function convertES2ModelSimple(hits) {
     //console.log("convertES2Model: hitCount " + hits.length);
     var brands = [];
-    if (hits.length == 1)
-        return hits[0]._source;
-    else {
         for (var i = 0; i < hits.length; i++) {
             brands.push(hits[i]._source);
             //console.log (JSON.stringify(hits[i]._source, null, 2))
         }
-    }
     return brands;
 }
 

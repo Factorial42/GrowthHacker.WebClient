@@ -1,0 +1,31 @@
+extends layout
+
+block content
+	.page-header
+		h2  User Listing
+
+	div
+	table
+		thead
+			th Name
+			th Email
+			th Reload
+			th Created At		
+			th Tokens		
+		tr
+		tbody
+			for user in users
+				tr
+					td.col-md-5(style="word-wrap: break-word; width:100px;")
+						a(href='/users/' + user.email + '/profile') #{user.profile.name} 
+					td.col-md-5(style="word-wrap: break-word; width:110px;")= user.email
+					td.col-md-5(style="word-wrap: break-word; width:100px;")
+						a(href='/users/' + user.email + '/reload')
+							img(src='http://chesa.com/app/wp-content/uploads/2016/03/ingest-icon.png', width='25', height='25')
+					td.col-md-5(style="word-wrap: break-word; width:1500px;")= user.createdAt			
+					td.col-md-5(style="word-wrap: break-word; width:1500px;")= JSON.stringify(user.tokens,null,2)			
+				tr
+			else
+				tr
+					td= "There are no users signed up into the platform!"
+				tr
