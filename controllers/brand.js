@@ -11,9 +11,9 @@ exports.getBrandByBrandId = (req, res) => {
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
         //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
         var brand = convertES2ModelSimple(_doc.hits);
-        //console.log(JSON.stringify(brand, null, 2));
+        console.log(JSON.stringify(brand, null, 2));
         res.render('brandDetail', {
-            brand: brand
+            brand: brand[0]
         });
     });
 };
@@ -23,7 +23,7 @@ exports.getAnalytics = (req, res) => {
     var brandId = req.params.brandId;
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
         //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
-        var brand = convertES2ModelSimple(_doc.hits);
+        var brand = convertES2ModelSimple(_doc.hits)[0];
         //console.log(JSON.stringify(brand, null, 2));
         res.render('analytics', {
             brand: brand
@@ -100,7 +100,7 @@ exports.postUpdateBrand = (req, res, next) => {
     }
 
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
-        var brand = convertES2ModelSimple(_doc.hits);
+        var brand = convertES2ModelSimple(_doc.hits)[0];
         brand.account_record_lastrefresh = req.body.account_record_lastrefresh.valueOf();
         brand.account_record_total = req.body.account_record_total.valueOf();
         
