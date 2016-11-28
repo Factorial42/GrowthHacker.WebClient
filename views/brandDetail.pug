@@ -40,11 +40,18 @@ block content
     .form-group
       label.col-sm-3.control-label(for='name') Dashboard Types: Options are eCommerce, Mobile Commerce, Content Marketing, Site Performance,Real-time Overview, S E O Overview
       .col-sm-7
-        input.form-control(type='text', name='account_dashboard_types', id='account_dashboard_types', value=brand.account_dashboard_types.toString())
+        if (brand.account_dashboard_types &&  brand.account_dashboard_types.length > 0)
+          input.form-control(type='text', name='account_dashboard_types', id='account_dashboard_types', value=brand.account_dashboard_types.toString())
+        else
+          input.form-control(type='text', name='account_dashboard_types', id='account_dashboard_types', value='')
     .form-group
       label.col-sm-3.control-label(for='name') Brand Tags:
       .col-sm-7
-        input.form-control(type='textarea', name='account_tags', id='account_tags', value=brand.account_tags.toString())
+        if (brand.account_tags &&  brand.account_tags.length > 0)
+          input.form-control(type='textarea', name='account_tags', id='account_tags', value=brand.account_tags.toString())
+        else
+          input.form-control(type='textarea', name='account_tags', id='account_tags', value='')
+
     .form-group
       label.col-sm-3.control-label(for='name') Brand Dashboard URL:
       .col-sm-7

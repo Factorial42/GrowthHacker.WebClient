@@ -10,7 +10,7 @@ exports.getBrandByBrandId = (req, res) => {
     var brandId = req.params.brandId;
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
         //console.log ( "RAW RESPONSE" + JSON.stringify(_doc, null, 2));
-        var brand = convertES2ModelSimple(_doc.hits);
+        var brand = convertES2ModelSimple(_doc.hits)[0];
         console.log(JSON.stringify(brand, null, 2));
         res.render('brandDetail', {
             brand: brand[0]
@@ -34,8 +34,8 @@ exports.getAnalytics = (req, res) => {
 //elastic version to retrieve all brands
 exports.getBrands = (req, res) => {
     ES.searchAll('brands', 'brand', function(_docs) {
-        //console.log("Brands are:" + JSON.stringify(_docs,null, 2));
         var docs = convertES2Model(_docs.hits, "Brand");
+        //console.log("Brands are:" + JSON.stringify(_docs,null, 2));
         res.render('brands', {
             brands: docs
         });
@@ -67,8 +67,10 @@ exports.getLoadGA = (req, res) => {
 
 exports.getBrandReingest = (req, res) => {
     var brandId = req.params.brandId;
+    console.log ( "Reingest/Enqueing ID: " + brandId);
+
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
-        var brand = convertES2ModelSimple(_doc.hits);
+        var brand = convertES2ModelSimple(_doc.hits)[0];
         console.log ( "Reingest/Enqueing Brand: " + brand.account_name);
 
         //Enqueue the brand for ingestion
@@ -138,7 +140,7 @@ exports.postUpdateBrand = (req, res, next) => {
 };
 
 function convertES2ModelSimple(hits) {
-    //console.log("convertES2Model: hitCount " + hits.length);
+    console.log("convertES2Model: hitCount " + hits.length);
     var brands = [];
         for (var i = 0; i < hits.length; i++) {
             brands.push(hits[i]._source);
