@@ -8,7 +8,12 @@ const GA = require('../util/getGA.js');
 const API = require('../util/APIFacade.js');
 const mongoose = require('mongoose');
 const OAuth2 = googleapis.auth.OAuth2;
+const dotenv = require('dotenv');
 
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
+dotenv.load({ path: './.env.example' });
 
 //Ensure connection to DB for play
 mongoose.Promise = global.Promise;
@@ -37,7 +42,8 @@ refreshOauth2Token('ya29.Ci-SA0TlOyYMQ93wYs_5KBXDxA_3ls-iFfxVzRgmgx1nw3ry6gdzOr-
 
 
 // call sequential GA test
-//loadGASeqTest();
+loadGASeqTest('1/q-253i8HO1vp48WwZXGvXO3ZBRVGV83OFBCRqN7oCFY','1/q-253i8HO1vp48WwZXGvXO3ZBRVGV83OFBCRqN7oCFY','info@hawkemedia.com');
+loadGASeqTest('ya29.Ci-QA0noYmhlMK4O5nLUKrp8JqWs2k749z0rPYl5eSeSbF9KTdxHH80_Hi5uBfcfug','1/VkaH9Id8ML0tHFS0_aZsRDLHrHGSi-QjYc92idp8O0A','erik@hawkemedia.com')
 
 //Test SQS messaging & sample POST
 /*
@@ -74,7 +80,7 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
         refresh_token: refreshToken,
     };
 
-    console.log("Old token set:" + JSON.stringify(oauth2Client, null, 2));
+    //console.log("Old token set:" + JSON.stringify(oauth2Client, null, 2));
 
     // check if token is valid
     tokenCheckURL = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken;
@@ -87,7 +93,7 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
                 // your access_token is now refreshed and stored in oauth2Client
                 // store these new tokens in a safe place (e.g. database)
                 if (err) console.log(err);
-                console.log("New token set:" + JSON.stringify(oauth2Client, null, 2));
+                //console.log("New token set:" + JSON.stringify(oauth2Client, null, 2));
                 callback(oauth2Client);
             });
         } else {
@@ -97,10 +103,18 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
 
     });
 }
-
-function loadGASeqTest() {
-    GA.getGA('ya29.CjCPA80PbLr7xGZtkPLoDeUp3Pjhsa7Whxc4KjTWfmIBxzZKHiDpEX312y0UQov7Ow4',
-        '', 'erik@hawkemedia.com');
+//Given a set of tokens, load all brands
+function loadGASeqTest(accessToken, refreshToken, email) {
+    console.log ( "loadGASeqTest::AT:" + accessToken);
+    console.log ( "loadGASeqTest::RT:" + refreshToken);
+    refreshOauth2Token(accessToken, refreshToken,
+    function(response) {
+        console.log ( "loadGASeqTest::nAT:" + response.credentials.access_token);
+        console.log ( "loadGASeqTest::nRT:" + response.credentials.refresh_token);
+        console.log(" Returned token set is:" + JSON.stringify(response, null, 2));
+        
+        GA.getGA( response.credentials.access_token, response.credentials.refresh_token, email);
+    });
 }
 
 function esTest() {

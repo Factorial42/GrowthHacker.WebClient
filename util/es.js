@@ -2,8 +2,8 @@ var elasticsearch = require('elasticsearch');
 
 var client = new elasticsearch.Client({
     hosts: [
-        //'http://52.37.72.190:9200'
-        'http://localhost:9200'
+        'http://52.37.72.190:9200'
+        //'http://localhost:9200'
     ]
 });
 

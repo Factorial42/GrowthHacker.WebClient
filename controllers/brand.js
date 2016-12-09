@@ -95,14 +95,14 @@ exports.getBrandReingest = (req, res) => {
 exports.postUpdateBrand = (req, res, next) => {
     const errors = req.validationErrors();
     var brandId = req.params.brandId;
-    console.log("Brand being updated with " + brandId);
+    console.log("Brand:" + brandId + " being updated");
     if (errors) {
         req.flash('errors', errors);
         return res.redirect('/login');
     }
 
     ES.searchByBrandId('brands', 'brand', brandId, function(_doc) {
-        var brand = convertES2ModelSimple(_doc.hits[0]);
+        var brand = convertES2ModelSimple(_doc.hits)[0];
         brand.account_record_lastrefresh = req.body.account_record_lastrefresh.valueOf();
         brand.account_record_total = req.body.account_record_total.valueOf();
         

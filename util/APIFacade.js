@@ -5,9 +5,6 @@ var AWS = require('aws-sdk');
 
 var syncRequest = deasync(request.post);
 
-
-
-
 function sendSQSMessage(_payload, callback) {
     AWS.config.update({
         accessKeyId: process.env.SQS_ACCESSKEY_ID,
@@ -19,7 +16,7 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: process.env.GA_BASELOAD_STARTDATE,
-        endDate: process.env.GA_BASELOAD_ENDDATE,
+        endDate: process.env.GA_BASELOAD_ENDDATE
         //justCounts: true
     };
 
@@ -66,6 +63,22 @@ function syncAPIGet(url, callback) {
         } else {
             console.log("syncAPIGet - Error:" + error);
             return callback(body);
+        }
+    });
+}
+
+//Sample GET
+function simpleAPIGet(url, response) {
+    request(url, function(error, response, body) {
+        //console.log("syncAPIGet:" + body);
+        //console.log("syncAPIGet:" + response);
+        //console.log("syncAPIGet:" + response.statusCode);
+
+        if (error) response.log("simpleAPIGet: error " + error);
+        if (!error && response.statusCode) {
+            return callback(response);
+        } else {
+            console.log("simpleAPIGet - Error:" + error);
         }
     });
 }
@@ -157,3 +170,4 @@ module.exports.asyncAPICall = asyncAPICall;
 module.exports.syncAPIGet = syncAPIGet;
 module.exports.syncAPIPost = syncAPIPost;
 module.exports.sendSQSMessage = sendSQSMessage;
+module.exports.simpleAPIGet = simpleAPIGet;

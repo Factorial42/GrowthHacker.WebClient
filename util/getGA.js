@@ -320,12 +320,15 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
 }
 
 function doesBrandAccountExist(brandId, callback) {
-    //console.log("doesBrandAccountExist in getGA.js:: " + brandId);
-    Brand.find((err, brands) => {
+    console.log("doesBrandAccountExist in getGA.js:: " + brandId);
+    /*Brand.find((err, brands) => {
         if (err) {
             console.log(err);
             callback(err);
-        }
+        }*/
+        ES.searchAll('brands', 'brand', function(_docs) {
+        var brands = convertES2ModelSimple(_docs.hits);
+        
         for (var i = 0; i < brands.length; i++) {
             //console.log("doesBrandAccountExist checking if:: " + brands[i].account_id + " == " + brandId);
             if (brands[i].account_id.toString() == brandId) {
@@ -338,6 +341,14 @@ function doesBrandAccountExist(brandId, callback) {
     });
 }
 
-
+function convertES2ModelSimple(hits) {
+    console.log("convertES2ModelSimple: hitCount " + hits.length);
+    var brands = [];
+        for (var i = 0; i < hits.length; i++) {
+            brands.push(hits[i]._source);
+            //console.log (JSON.stringify(hits[i]._source, null, 2))
+        }
+    return brands;
+}
 module.exports.getGA = getGA;
 module.exports.refreshOauth2Token = refreshOauth2Token;
