@@ -179,7 +179,7 @@ function searchAll(indexName, indexType, callback) {
         size: 10000,
         body: {
             query: {
-                matchAll: {}
+                match_all: {}
             },
         }
     }, function(error, response, status) {

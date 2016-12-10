@@ -17,18 +17,18 @@ var client = new elasticsearch.Client({
     hosts: [
         'http://52.37.72.190:9200'
         //'http://localhost:9200'
-    ]
+    ]//,
+    //apiVersion: '5.0'
 });
 
 
 //This is a standalone application to re-enqueue 
 //problematic GA accounts to enqueue to SQS manually
-//reEnqueueBrandsWithZeroAnalyticDatasets();
+reEnqueueBrandsWithZeroAnalyticDatasets();
 
 //Standalone method to refresh all brands with new tokens(in lieu of stale ones) and also update 
 // just counts on the brands index
-
-reEnqueueBrandsWithOnlyCountUpdates();
+//reEnqueueBrandsWithOnlyCountUpdates();
 
 
 
@@ -127,7 +127,7 @@ function reEnqueueBrandsWithZeroAnalyticDatasets() {
 
                 if (tetherEmail.toString().trim() === 'info@hawkemedia.com') { // || tetherEmail.toString().trim() === 'erik@hawkemedia.com') {
                     console.log("N Q ing... : " + hits[i]._id);
-                    console.log("Brand is:" + JSON.stringify(hits[i], null, 2));
+                    //console.log("Brand is:" + JSON.stringify(hits[i], null, 2));
                     //console.log("isBrandIngestible: " + isBrandIngestible(hits[i]));
                     //process.exit();
 
@@ -190,7 +190,7 @@ function searchAll(indexName, indexType, callback) {
         size: 10000,
         body: {
             query: {
-                matchAll: {}
+                match_all: {}
             },
         }
     }, function(error, response, status) {
@@ -221,8 +221,8 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: '2005-01-01',
-        endDate: 'today',
-        justCounts: true
+        endDate: 'today'
+        //,justCounts: true
     };
 
     //console.log ( "MESSAGE:" + JSON.stringify( msg, null, 2));

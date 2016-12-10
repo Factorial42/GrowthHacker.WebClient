@@ -16,7 +16,7 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: process.env.GA_BASELOAD_STARTDATE,
-        endDate: process.env.GA_BASELOAD_ENDDATE
+        endDate: process.env.GA_BASELOAD_ENDDATE//,
         //justCounts: true
     };
 
