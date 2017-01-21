@@ -4,11 +4,38 @@ var googleapis = require('googleapis');
 var request = require('request');
 var deasync = require('deasync');
 
+const mongoose = require('mongoose');
 const OAuth2 = googleapis.auth.OAuth2;
 
+/**
+ * Load environment variables for Mongo from .env file, 
+ * where API keys and passwords are configured
+ * and connect/validate its running
+ */
+dotenv.load({ path: './.env.example' });
 
-const GA_DASHBOARD_BASEURL = "http://52.37.72.190:5601/app/kibana#/dashboard/";
-const GA_DASHBOARD_TEMPLATE = "Ecommerce-Dashboard?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-1y,mode:quick,to:now))&_a=(filters:!(),options:(darkTheme:!t),panels:!((col:1,id:GrowthHacker_Rev-Count-by-Monthly-Aggregate,panelIndex:1,row:9,size_x:6,size_y:5,type:visualization),(col:7,id:GrowthHacker_UserCount-by-UserTypes,panelIndex:2,row:9,size_x:6,size_y:5,type:visualization),(col:1,id:GrowthHacker_Average-of..Weekly,panelIndex:4,row:1,size_x:12,size_y:4,type:visualization),(col:7,id:GrowthHacker_Traffic-Count-by-Monthly,panelIndex:5,row:14,size_x:6,size_y:4,type:visualization),(col:1,id:GrowthHacker_Acquisition-Traffic-By-Source-slash-Medium,panelIndex:6,row:5,size_x:12,size_y:4,type:visualization),(col:1,id:GrowthHacker_Someting-Wong,panelIndex:7,row:14,size_x:6,size_y:4,type:visualization),(col:7,id:GrowthHacker_Unique-Visitors-and-Product-Revenue-by-Source-slash-Medium,panelIndex:8,row:18,size_x:6,size_y:5,type:visualization),(col:1,id:GrowthHacker_Transactions-By-Source-Medium-Bars,panelIndex:9,row:23,size_x:12,size_y:5,type:visualization),(col:1,id:GrowthHacker_Transactions-By-Source-Medium,panelIndex:10,row:18,size_x:6,size_y:5,type:visualization),(col:1,id:GrowthHacker_Revenue-By-Source-slash-Medium-Bars,panelIndex:11,row:28,size_x:12,size_y:6,type:visualization),(col:1,id:GrowthHacker_Revenue-By-Channel-Grouping,panelIndex:12,row:34,size_x:7,size_y:5,type:visualization),(col:8,id:GrowthHacker_Top-10-products-by-revenue,panelIndex:13,row:34,size_x:5,size_y:5,type:visualization),(col:1,id:GrowthHacker_TimeLine-Sampling,panelIndex:14,row:39,size_x:12,size_y:4,type:visualization)),query:(query_string:(analyze_wildcard:!t,query:'*')),title:'Ecommerce%20Dashboard',uiState:(P-1:(vis:(legendOpen:!f)),P-10:(vis:(legendOpen:!f)),P-11:(vis:(legendOpen:!f)),P-12:(vis:(colors:(Revenue:%23EF843C),legendOpen:!f)),P-2:(vis:(legendOpen:!f)),P-3:(vis:(legendOpen:!t)),P-4:(spy:(mode:(fill:!f,name:!n)),vis:(legendOpen:!t)),P-5:(vis:(legendOpen:!f)),P-6:(spy:(mode:(fill:!f,name:!n))),P-7:(vis:(legendOpen:!f)),P-9:(vis:(legendOpen:!f))))";
+//Ensure connection to DB for play
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.MONGODB_URI);
+mongoose.connection.on('connected', () => {
+    console.log(' MongoDB connection established to ' +  process.env.MONGODB_URI + '!');
+});
+mongoose.connection.on('error', () => {
+    console.log('%s MongoDB connection error. Please make sure MongoDB is running.');
+    process.exit();
+});
+
+/** 
+* Connect To Elastic
+* and Validate it's accessible
+*/
+
+if (ES.ping()){
+  console.log('%s ElasticSearch error. Please make sure ' + process.env.ELASTICHOSTANDPORT + ' is running.', chalk.red('✗'));
+  process.exit();
+}else
+  console.log('%s ElasticSearch connection established to ==> ' + process.env.ELASTICHOSTANDPORT + '!', chalk.green('✓'));
+
 
 
 var client = new elasticsearch.Client({
@@ -20,42 +47,25 @@ var client = new elasticsearch.Client({
 });
 
 
-//This is a standalone application to re-enqueue 
-//problematic GA accounts to enqueue to SQS manually
-//reEnqueueBrandsWithZeroAnalyticDatasets();
+/** Connect to Elastic to fetch all user tokens
+* to refresh 
+* A: New Brands tethered to the account
+* B: Refresh all user brands per token(get new data sets since last run)
+* B.2: Update all brand data counts for QA/Validation or reconciliation of records manually
+*/
 
-//Standalone method to refresh all brands with new tokens(in lieu of stale ones) and also update 
-// just counts on the brands index
-reEnqueueBrandsWithOnlyCountUpdates();
-
-
-
-//this is a standlone application to re-index
-//brands with records > 0 for ecommerce base type
-//of dashboard along with the dash url set to the master account view
-//reIndexWithDashtypeAndDashURL();
-
-
-
-
-function reIndexWithDashtypeAndDashURL() {
-    searchAll('brands', 'brand', function(response) {
-        var hits = response.hits;
-        for (var i = 0; i < hits.length; i++) {
-            var recordCount = hits[i]._source.account_record_total;
-            //console.log("PRE TINKER:" + JSON.stringify(hits[i]._source, null, 2));
-
-            if (recordCount > 0) {
-                hits[i]._source.account_dashboard_types = ['eCommerce'];
-                hits[i]._source.account_dashboard_url = GA_DASHBOARD_BASEURL + GA_DASHBOARD_TEMPLATE.replace(/\*/, 'accountId:%22' + hits[i]._id + "%22");
-                //console.log("POST TINKER:" + JSON.stringify(hits[i]._source, null, 2));
-                index('brands', 'brand', hits[i]._source);
-                //process.exit();
-            }
-
-        }
+//Get Users Elastic Version
+//GET /users
+exports.getUsers {
+    ES.searchAll('users', 'user', function(_docs) {
+        console.log("Users are:" + JSON.stringify(_docs, null, 2));
+        var docs = convertES2ModelSimple(_docs.hits);
+        //console.log("Response is :" + JSON.stringify(docs, null, 2));
     });
-}
+};
+
+
+
 
 function reEnqueueBrandsWithOnlyCountUpdatesSendMessage(hit){
             var tetherEmail;
@@ -219,9 +229,8 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: '2005-01-01',
-        endDate: 'today',
-        forceStartDate: true
-        //,justCounts: true
+        endDate: 'today'
+        ,justCounts: true
     };
 
     //console.log ( "MESSAGE:" + JSON.stringify( msg, null, 2));

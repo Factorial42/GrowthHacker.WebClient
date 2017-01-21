@@ -379,6 +379,18 @@ exports.getForgot = (req, res) => {
     });
 };
 
+/**
+ * GET /usersmongo
+ * List all Users.
+ */
+exports.getUsersMongo = (req, res) => {
+    User.find((err, docs) => {
+        console.log("Mongo Users are: " + + JSON.stringify(docs, null, 2));
+        res.render('users', {
+            users: docs
+        });
+    });
+};
 
 //Get Users Elastic Version
 //GET /users

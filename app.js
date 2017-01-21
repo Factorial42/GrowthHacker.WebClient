@@ -144,6 +144,7 @@ app.get('/loadBrandsAndGA', passportConfig.isAuthenticated,userController.getloa
 app.get('/loadGA', passportConfig.isAuthenticated,brandController.getLoadGA);
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
 app.get('/users', passportConfig.isAuthenticated,userController.getUsers);
+app.get('/usersmongo', passportConfig.isAuthenticated,userController.getUsersMongo);
 app.get('/analytics/:brandId', passportConfig.isAuthenticated,brandController.getAnalytics);
 app.get('/brands/:brandId', passportConfig.isAuthenticated,brandController.getBrandByBrandId);
 app.get('/users/:userId/reload', passportConfig.isAuthenticated,userController.getreloadBrandAndGA);
