@@ -219,9 +219,9 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: '2005-01-01',
-        endDate: 'today',
+        endDate: 'today'/*,
         forceStartDate: true
-        //,justCounts: true
+        ,justCounts: true */
     };
 
     //console.log ( "MESSAGE:" + JSON.stringify( msg, null, 2));
