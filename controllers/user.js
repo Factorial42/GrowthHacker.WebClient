@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
 const GA = require('../util/getGA');
+const snq = require('../util/searchNQ');
 const ES = require('../util/es.js');
 
 /**
@@ -451,7 +452,7 @@ exports.getreloadBrandAndGA = (req, res) => {
 };
 
 /**
- * GET /loadga
+ * GET /loadBrandsAndGA
  * Load a test case for all brands attached to info.
  */
 exports.getloadBrandsAndGA = (req, res) => {
@@ -484,8 +485,10 @@ exports.getloadBrandsAndGA = (req, res) => {
                 }
             }
         }
-        //After done, just respond with a render to load brands page      
-        res.redirect('/users');
+        //After done, just respond with a render to user page      
+        //res.redirect('/users');
+        snq.reEnqueue();
+        res.sendStatus(200);
     });
 };
 

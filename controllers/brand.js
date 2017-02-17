@@ -36,6 +36,7 @@ exports.getBrands = (req, res) => {
     ES.searchAll('brands', 'brand', function(_docs) {
         var docs = convertES2Model(_docs.hits, "Brand");
         //console.log("Brands are:" + JSON.stringify(_docs,null, 2));
+        //console.log("Brand data total:" + docs[0].account_record_counts_last_refresh.account_record_counts_lastrefresh_totals[0].actual_total);
         res.render('brands', {
             brands: docs
         });
@@ -155,6 +156,7 @@ function convertES2Model(hits, indexName) {
     for (var i = 0; i < hits.length; i++) {
         if (hits[i]._source.account_tags && hits[i]._source.account_tags.length > 2)
             hits[i]._source.account_tags.splice(2);
+            //hits[i]._source.account_record_total = hits[i]._source.account_record_counts_last_refresh.account_record_counts_lastrefresh_totals[0].actual_total;
         brands.push(hits[i]._source);
         //console.log (JSON.stringify(hits[i]._source, null, 2))
     }

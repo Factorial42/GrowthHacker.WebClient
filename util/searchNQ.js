@@ -26,7 +26,7 @@ var client = new elasticsearch.Client({
 
 //Standalone method to refresh all brands with new tokens(in lieu of stale ones) and also update 
 // just counts on the brands index
-reEnqueueBrandsWithOnlyCountUpdates();
+//reEnqueueBrandsWithOnlyCountUpdates();
 
 
 
@@ -219,9 +219,9 @@ function sendSQSMessage(_payload, callback) {
     var msg = {
         brand: _payload,
         startDate: '2005-01-01',
-        endDate: 'today'/*,
-        forceStartDate: true
-        ,justCounts: true */
+        endDate: 'today'
+        //forceStartDate: true,
+        //justCounts: true
     };
 
     //console.log ( "MESSAGE:" + JSON.stringify( msg, null, 2));
@@ -304,3 +304,8 @@ function refreshOauth(accessToken, refreshToken, callback) {
         }
     });
 }
+
+
+
+
+module.exports.reEnqueue = reEnqueueBrandsWithOnlyCountUpdates;
