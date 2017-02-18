@@ -494,7 +494,11 @@ exports.getloadBrandsAndGA = (req, res) => {
     });
 };
 
-
+ exports.sendIngestionStats = (req, res) => {
+    mailer.sendEmailMessage();
+    res.sendStatus(200);
+ }
+ 
 /**
  * POST /forgot
  * Create a random token, then the send user an email with a reset link.

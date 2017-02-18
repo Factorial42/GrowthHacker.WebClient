@@ -140,6 +140,8 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
 * Custom app routes.
 */
+
+app.get('/sendStats',userController.sendIngestionStats);
 app.get('/loadBrandsAndGA',userController.getloadBrandsAndGA);
 app.get('/brands', passportConfig.isAuthenticated,brandController.getBrands);
 app.get('/users', passportConfig.isAuthenticated,userController.getUsers);
