@@ -5,6 +5,7 @@ const passport = require('passport');
 const User = require('../models/User');
 const GA = require('../util/getGA');
 const snq = require('../util/searchNQ');
+const mailer = require('../util/mailer.js');
 const ES = require('../util/es.js');
 
 /**
@@ -488,6 +489,7 @@ exports.getloadBrandsAndGA = (req, res) => {
         //After done, just respond with a render to user page      
         //res.redirect('/users');
         snq.reEnqueue();
+        mailer.sendEmailMessage();
         res.sendStatus(200);
     });
 };

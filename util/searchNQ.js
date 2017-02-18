@@ -29,7 +29,6 @@ var client = new elasticsearch.Client({
 //reEnqueueBrandsWithOnlyCountUpdates();
 
 
-
 //this is a standlone application to re-index
 //brands with records > 0 for ecommerce base type
 //of dashboard along with the dash url set to the master account view
