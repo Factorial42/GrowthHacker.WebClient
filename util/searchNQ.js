@@ -26,7 +26,7 @@ var client = new elasticsearch.Client({
 
 //Standalone method to refresh all brands with new tokens(in lieu of stale ones) and also update 
 // just counts on the brands index
-//reEnqueueBrandsWithOnlyCountUpdates();
+reEnqueueBrandsWithOnlyCountUpdates();
 
 
 //this is a standlone application to re-index
@@ -61,7 +61,7 @@ function reEnqueueBrandsWithOnlyCountUpdatesSendMessage(hit){
 
     if (hit._source.views) 
         tetherEmail = hit._source.views[0].view_tethered_user_email;
-            console.log(" Brand " + hit._source.account_name + ":" + hit._source.account_id + " has analytic count of " + hit._source.account_record_lastrefresh + " tethered by " + tetherEmail);
+            console.log(" Brand " + hit._source.account_name + ":" + hit._source.account_id + " has analytic count of " + hit._source.actual_totals.consolidated_total + " tethered by " + tetherEmail);
 
             if (hit._source.views && hit._source.account_oauthtoken && hit._source.account_refresh_oauthtoken) {
 
@@ -93,7 +93,8 @@ function reEnqueueBrandsWithOnlyCountUpdates() {
         for (var i = 0; i < hits.length; i++){
             (function(m){
                 console.log("Iter is:: " + i);
-                reEnqueueBrandsWithOnlyCountUpdatesSendMessage(hits[i]);                
+                reEnqueueBrandsWithOnlyCountUpdatesSendMessage(hits[i]); 
+                //process.exit(); //end after just testing one brand ingest              
             }(i));
         }
     });
