@@ -489,7 +489,7 @@ exports.getloadBrandsAndGA = (req, res) => {
         //After done, just respond with a render to user page      
         //res.redirect('/users');
         snq.reEnqueue();
-        mailer.sendEmailMessage();
+        //mailer.sendEmailMessage();
         res.sendStatus(200);
     });
 };
