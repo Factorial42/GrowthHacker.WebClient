@@ -90,7 +90,8 @@ function reEnqueueBrandsWithOnlyCountUpdates() {
     searchAll('brands', 'brand', function(response) {
         var hits = response.hits;
         console.log("reEnqueueBrandsWithOnlyCountUpdates:: size " + hits.length);
-        for (var i = 0; i < hits.length; i++){
+        //for (var i = 0; i < hits.length; i++){
+        for (var i = 0; i < 1; i++){
             (function(m){
                 console.log("Iter is:: " + i);
                 reEnqueueBrandsWithOnlyCountUpdatesSendMessage(hits[i]); 
