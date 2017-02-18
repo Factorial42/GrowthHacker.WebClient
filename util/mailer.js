@@ -30,11 +30,14 @@ request(endPoint, function(error, response, body) {
 
 // setup email data with unicode symbols
 let mailOptions = {
-    from: '"F42 Admin 👻" <donotreply@f42labs.com>', // sender address
-    to: 'mpreddy77@gmail.com, jay@f42lab.com, clark@f42labs.com,reddy@f42labs.com', // list of receivers
+    from: '"F42 Admin 👻" <donotreply@f42labs.com>',
+    to: 'mpreddy77@gmail.com, jay@f42labs.com, clark@f42labs.com,reddy@f42labs.com',
     subject: 'HawkIQ Load Stats : ' + new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '') ,
-    html: '<b>GA Load Stats:</b> <br>'  + Thebody , // html body
+    html: '<b>GA Load Stats:</b> <br>'  + Thebody ,
 };
+
+
+
 
 // send mail with defined transport object
 transporter.sendMail(mailOptions, (error, info) => {
