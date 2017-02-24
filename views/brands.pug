@@ -29,7 +29,10 @@ block content
 								a(href='analytics/' + brand.account_id) View									
 					else
 							td Not Set 
-					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.actual_totals.consolidated_total
+					if (brand.actual_totals === null || brand.actual_totals.consolidated_total === null )
+							td.col-md-5(style="word-wrap: break-word; width:50px;") NaN
+					else
+						td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.actual_totals.consolidated_total
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_dashboard_types			
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_tags	
 					td.col-md-5(style="word-wrap: break-word; width:50px;")= brand.account_ingest_status
