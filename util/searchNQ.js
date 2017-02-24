@@ -58,10 +58,17 @@ function reIndexWithDashtypeAndDashURL() {
 
 function reEnqueueBrandsWithOnlyCountUpdatesSendMessage(hit){
             var tetherEmail;
+            var consolidatedTotal;
 
     if (hit._source.views) 
         tetherEmail = hit._source.views[0].view_tethered_user_email;
-            console.log(" Brand " + hit._source.account_name + ":" + hit._source.account_id + " has analytic count of " + hit._source.actual_totals.consolidated_total + " tethered by " + tetherEmail);
+
+        if (hit._source.actual_totals === null || hit._source.actual_totals.consolidated_total == null)
+            consolidatedTotal = 0;
+        else
+            consolidatedTotal = hit._source.actual_totals.consolidated_total;
+
+            console.log(" Brand " + hit._source.account_name + ":" + hit._source.account_id + " has analytic count of " + consolidatedTotal + " tethered by " + tetherEmail);
 
             if (hit._source.views && hit._source.account_oauthtoken && hit._source.account_refresh_oauthtoken) {
 
