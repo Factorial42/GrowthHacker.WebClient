@@ -41,10 +41,12 @@ refreshOauth2Token('ya29.Ci-SA0TlOyYMQ93wYs_5KBXDxA_3ls-iFfxVzRgmgx1nw3ry6gdzOr-
 */
 
 
-// call sequential GA test
+// call sequential GA test erik@gmail.com
 loadGASeqTest('ya29.Gl0MBNAvGY-bTlWLE66LAwByqLCCC9N7YIG-kqC277BQwKEyDFzj3SpqjrimHepAqT9AktEt8GZ82EWV_Zzqfa_7FdYivbWR89PC2z5_NB7tkMSKEtGJsSJgIjApSJU','1/6zynj2UyUt45op7XJ5mLYmh1NVRFaPIK-P5AQ2cCzn8','erikhuberman@gmail.com');
-//loadGASeqTest('1/q-253i8HO1vp48WwZXGvXO3ZBRVGV83OFBCRqN7oCFY','1/q-253i8HO1vp48WwZXGvXO3ZBRVGV83OFBCRqN7oCFY','info@hawkemedia.com');
-//loadGASeqTest('ya29.Ci-QA0noYmhlMK4O5nLUKrp8JqWs2k749z0rPYl5eSeSbF9KTdxHH80_Hi5uBfcfug','1/VkaH9Id8ML0tHFS0_aZsRDLHrHGSi-QjYc92idp8O0A','erik@hawkemedia.com')
+
+//info@hawkemedia.com
+//loadGASeqTest('ya29.Gl0MBH38L9O_weRlcGxncMnFWBytav0c7QlNbsb084-csHR9lJZDcMPR0nTHCy2JfF9lhC46zkbHp_KKXby17a-prffofKXH-VkVrZ4_65zSbtxpaoVBqPHyFaW1VaU','1/SxWf_o7JbEZ4BEduc2srGIw9ElJDS0HvUxcSO2pVijk','info@hawkemedia.com')
+
 
 //Test SQS messaging & sample POST
 /*

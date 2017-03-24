@@ -31,7 +31,7 @@ request(endPoint, function(error, response, body) {
 // setup email data with unicode symbols
 let mailOptions = {
     from: '"F42 Admin 👻" <donotreply@f42labs.com>',
-    to: 'jay@f42labs.com, clark@f42labs.com,reddy@f42labs.com, murali.pavithran@gmail.com',
+    to: 'jay@f42labs.com,reddy@f42labs.com, murali.pavithran@gmail.com',
     subject: 'HawkeIQ Ingestion Stats : ' + new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '') ,
     html: '<b>GA Load:</b> <br>'  + Thebody ,
 };

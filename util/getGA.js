@@ -78,7 +78,7 @@ function handleAccounts(oauth2Client, response, userEmail) {
                 brand.tether_refresh_datetime = null;
                 brand.account_oauthtoken = gaToken;
                 brand.account_refresh_oauthtoken = gaRefreshToken;
-                brand.actual_totals.consolidated_total=0;
+                //brand.actual_totals.consolidated_total=0;
 
                 //set the dashboard url
                 brand.account_dashboard_url = process.env.GA_DASHBOARD_BASEURL + process.env.GA_DASHBOARD_TEMPLATE.replace( /\*/, 'accountId:%22' + brand.account_id + "%22" );

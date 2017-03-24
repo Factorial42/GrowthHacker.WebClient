@@ -15,11 +15,16 @@ const brandSchema = new mongoose.Schema({
     account_default_profile_id: String,
 	account_tags: [],
 	account_tetherer_email: String,
+
+  //actual_totals.consolidated_total:{ type: Number, default: 0 },
+
 	account_record_total: { type: Number, default: 0 },
 	account_record_lastrefresh: { type: Number, default: 0 },
 	account_ingest_status: { type: String, default: 'Enqueued' }, //[Success, Failure for the base load as well as last run]
 	account_tether_refresh_datetime: Date,
   account_dashboard_url: { type: String, default:''},
+
+  
   account_dashboard_types: [],
   	views: [{
     view_id: String,
@@ -31,7 +36,6 @@ const brandSchema = new mongoose.Schema({
    	view_channel_type: String,
    	view_ecommerce_tracking: Boolean,
    	view_enhanced_ecommerce_tracking: Boolean
-
   }]
 },{timestamps: true });
 
