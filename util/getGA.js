@@ -298,6 +298,7 @@ function refreshOauth2Token(accessToken, refreshToken, callback) {
 
     console.log("Old token set:" + JSON.stringify(oauth2Client));
 
+
     // check if token is valid
     tokenCheckURL = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + accessToken;
     request(tokenCheckURL, function(error, response, body) {
